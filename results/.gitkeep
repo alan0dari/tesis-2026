@@ -1,0 +1,5 @@
+# Directorio de Resultados
+
+Este directorio contiene los resultados de los experimentos realizados con el framework.
+
+Los archivos generados automáticamente no se incluyen en el control de versiones (ver `.gitignore`).
