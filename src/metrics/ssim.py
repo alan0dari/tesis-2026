@@ -5,7 +5,7 @@ SSIM es una métrica de calidad de imagen que evalúa la similitud percibida
 entre dos imágenes considerando luminancia, contraste y estructura.
 """
 
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 import numpy as np
 from numpy.typing import NDArray
 from skimage.metrics import structural_similarity
