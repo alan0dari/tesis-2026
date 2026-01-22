@@ -1,0 +1,227 @@
+\chapter{Marco Teórico: Imágenes Médicas y Ortopantomografías}
+
+\section{Imágenes Médicas}
+
+\subsection{Características de las Imágenes Médicas}
+
+Las imágenes médicas son representaciones visuales de la anatomía interna del cuerpo humano obtenidas mediante diversas modalidades de adquisición. Se caracterizan por:
+
+\begin{itemize}
+    \item \textbf{Alta dimensionalidad:} Resoluciones de varios megapíxeles
+    \item \textbf{Rango dinámico variable:} Dependiendo de la modalidad
+    \item \textbf{Ruido inherente:} Debido al proceso de adquisición
+    \item \textbf{Artefactos:} Distorsiones y anomalías del proceso de captura
+\end{itemize}
+
+\subsection{Modalidades de Imágenes Médicas}
+
+\subsubsection{Rayos X}
+Utilizan radiación ionizante para generar imágenes de estructuras óseas y tejidos densos.
+
+\subsubsection{Tomografía Computarizada (CT)}
+Genera imágenes tridimensionales mediante múltiples proyecciones de rayos X.
+
+\subsubsection{Resonancia Magnética (MRI)}
+Utiliza campos magnéticos y ondas de radio para visualizar tejidos blandos.
+
+\subsubsection{Ultrasonido}
+Emplea ondas sonoras de alta frecuencia para generar imágenes en tiempo real.
+
+\section{Ortopantomografías}
+
+\subsection{Definición y Principio de Funcionamiento}
+
+La ortopantomografía, también conocida como radiografía panorámica dental, es una técnica radiológica que produce una imagen bidimensional de la dentadura completa, maxilares, articulaciones temporomandibulares y estructuras circundantes en una sola toma.
+
+\subsubsection{Principio Físico}
+\begin{itemize}
+    \item Fuente de rayos X y detector se mueven sincronizadamente
+    \item Captura estructuras en un arco curvo
+    \item Proyección ortogonal de estructuras tridimensionales en plano 2D
+\end{itemize}
+
+\subsection{Aplicaciones Clínicas}
+
+Las ortopantomografías se utilizan para:
+
+\begin{enumerate}
+    \item \textbf{Diagnóstico general:}
+    \begin{itemize}
+        \item Detección de caries
+        \item Evaluación de enfermedad periodontal
+        \item Identificación de quistes y tumores
+    \end{itemize}
+    
+    \item \textbf{Planificación de tratamientos:}
+    \begin{itemize}
+        \item Implantes dentales
+        \item Cirugía ortognática
+        \item Extracción de muelas del juicio
+    \end{itemize}
+    
+    \item \textbf{Evaluación de desarrollo:}
+    \begin{itemize}
+        \item Erupción dental en niños
+        \item Anomalías de desarrollo
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Limitaciones y Desafíos}
+
+\subsubsection{Limitaciones Técnicas}
+\begin{itemize}
+    \item Distorsión geométrica inherente
+    \item Superposición de estructuras
+    \item Variabilidad en exposición
+    \item Artefactos de movimiento
+\end{itemize}
+
+\subsubsection{Desafíos de Contraste}
+\begin{itemize}
+    \item Bajo contraste en tejidos blandos
+    \item Variabilidad en densidad ósea
+    \item Efectos de endurecimiento del haz
+    \item Ruido cuántico
+\end{itemize}
+
+\section{Procesamiento de Imágenes Médicas}
+
+\subsection{Preprocesamiento}
+
+\subsubsection{Reducción de Ruido}
+Técnicas para eliminar ruido mientras se preservan bordes y detalles importantes.
+
+\subsubsection{Normalización}
+Ajuste de intensidades para estandarizar imágenes de diferentes fuentes.
+
+\subsection{Mejora de Contraste}
+
+\subsubsection{Ecualización de Histograma Global}
+Redistribuye los niveles de intensidad para utilizar todo el rango dinámico.
+
+\[
+h(i) = \frac{n_i}{N}
+\]
+
+donde $n_i$ es el número de píxeles con intensidad $i$ y $N$ es el número total de píxeles.
+
+\subsubsection{Ecualización de Histograma Adaptativa}
+Aplica ecualización en regiones locales de la imagen.
+
+\subsubsection{CLAHE (Contrast Limited Adaptive Histogram Equalization)}
+Versión mejorada de AHE que limita la amplificación de contraste para evitar sobre-realce de ruido.
+
+\textbf{Parámetros principales:}
+\begin{itemize}
+    \item $R_x, R_y$: Tamaño de la región contextual (tile size)
+    \item $C$: Límite de contraste (clip limit)
+\end{itemize}
+
+\textbf{Algoritmo:}
+\begin{algorithm}
+\caption{CLAHE}
+\begin{algorithmic}
+\STATE Dividir imagen en regiones $(R_x \times R_y)$
+\FOR{cada región}
+    \STATE Calcular histograma local
+    \STATE Aplicar límite de contraste $C$
+    \STATE Redistribuir píxeles recortados uniformemente
+    \STATE Ecualizar histograma
+\ENDFOR
+\STATE Interpolar entre regiones para eliminar bordes
+\end{algorithmic}
+\end{algorithm}
+
+\section{Métricas de Evaluación de Calidad}
+
+\subsection{Entropía de Shannon}
+
+Mide la cantidad de información contenida en una imagen:
+
+\[
+H = -\sum_{i=0}^{L-1} p_i \log_2(p_i)
+\]
+
+donde $p_i$ es la probabilidad del nivel de gris $i$.
+
+\textbf{Interpretación:}
+\begin{itemize}
+    \item Mayor entropía $\rightarrow$ Mayor información
+    \item Rango: $[0, \log_2(L)]$ donde $L$ es el número de niveles de gris
+\end{itemize}
+
+\subsection{SSIM (Structural Similarity Index)}
+
+Evalúa la similitud estructural entre dos imágenes:
+
+\[
+\text{SSIM}(x,y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}
+\]
+
+donde:
+\begin{itemize}
+    \item $\mu_x, \mu_y$: medias
+    \item $\sigma_x, \sigma_y$: desviaciones estándar
+    \item $\sigma_{xy}$: covarianza
+    \item $C_1, C_2$: constantes de estabilización
+\end{itemize}
+
+\textbf{Componentes:}
+\begin{itemize}
+    \item Luminancia: $l(x,y)$
+    \item Contraste: $c(x,y)$
+    \item Estructura: $s(x,y)$
+\end{itemize}
+
+\subsection{VQI (Visual Quality Index)}
+
+Métrica perceptual que considera:
+\begin{itemize}
+    \item Contraste local
+    \item Nitidez (sharpness)
+    \item Distribución de intensidades
+    \item Ausencia de artefactos
+\end{itemize}
+
+\section{Estado del Arte}
+
+\subsection{Métodos Tradicionales}
+
+\subsubsection{Mejora Basada en Histograma}
+\begin{itemize}
+    \item Ecualización global
+    \item Especificación de histograma
+    \item Ecualización local
+\end{itemize}
+
+\subsubsection{Mejora Basada en Dominio de Frecuencia}
+\begin{itemize}
+    \item Filtrado homómrfico
+    \item Filtros de realce de alta frecuencia
+\end{itemize}
+
+\subsection{Métodos Avanzados}
+
+\subsubsection{Basados en Optimización}
+\begin{itemize}
+    \item Algoritmos genéticos para ajuste de parámetros
+    \item Optimización por enjambre de partículas
+    \item Recocido simulado
+\end{itemize}
+
+\subsubsection{Basados en Aprendizaje Profundo}
+\begin{itemize}
+    \item Redes neuronales convolucionales
+    \item Redes adversarias generativas (GANs)
+    \item Autoencoders
+\end{itemize}
+
+\subsection{Gaps en la Literatura}
+
+A pesar de los avances, existen áreas poco exploradas:
+\begin{itemize}
+    \item Integración de optimización multiobjetivo con MCDM
+    \item Validación sistemática con múltiples métricas
+    \item Frameworks flexibles y extensibles
+    \item Consideración de preferencias de usuarios expertos
+\end{itemize}

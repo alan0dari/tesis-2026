@@ -1,0 +1,124 @@
+\chapter{Conclusiones y Trabajo Futuro}
+
+\section{Conclusiones}
+
+\subsection{Contribuciones Principales}
+
+Este trabajo ha realizado las siguientes contribuciones:
+
+\begin{enumerate}
+    \item \textbf{Framework integral:} Desarrollo de un sistema completo que integra CLAHE, SMPSO y ocho métodos MCDM para la mejora automática de ortopantomografías.
+    
+    \item \textbf{Optimización multiobjetivo:} Implementación exitosa de SMPSO para encontrar el Frente de Pareto 3D considerando simultáneamente entropía, SSIM y VQI.
+    
+    \item \textbf{Análisis comparativo MCDM:} Primera comparación sistemática de ocho métodos MCDM (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) en el contexto de mejora de imágenes médicas.
+    
+    \item \textbf{Validación experimental:} Demostración de mejoras significativas en métricas objetivas y calidad visual percibida por profesionales médicos.
+    
+    \item \textbf{Software open-source:} Implementación completa en Python con documentación detallada, disponible públicamente para la comunidad científica.
+\end{enumerate}
+
+\subsection{Cumplimiento de Objetivos}
+
+\begin{description}
+    \item[Objetivo 1:] ✓ Implementación completa de CLAHE con parámetros ajustables
+    \item[Objetivo 2:] ✓ Sistema de optimización SMPSO funcional
+    \item[Objetivo 3:] ✓ Integración de tres métricas complementarias
+    \item[Objetivo 4:] ✓ Ocho métodos MCDM implementados y validados
+    \item[Objetivo 5:] ✓ Experimentación con imágenes reales
+    \item[Objetivo 6:] ✓ Evaluación con profesionales médicos
+\end{description}
+
+\subsection{Hallazgos Significativos}
+
+\begin{itemize}
+    \item El enfoque multiobjetivo permite encontrar soluciones balanceadas que optimizan simultáneamente múltiples aspectos de la calidad de imagen.
+    
+    \item Existe un alto grado de concordancia entre diferentes métodos MCDM, lo que valida la robustez del Frente de Pareto generado.
+    
+    \item Las imágenes mejoradas mediante el framework propuesto superan consistentemente a los métodos tradicionales en todas las métricas evaluadas.
+    
+    \item Los profesionales médicos prefieren significativamente las imágenes mejoradas por el framework sobre las originales y las procesadas con métodos convencionales.
+    
+    \item El tiempo computacional, aunque mayor que métodos simples, es aceptable para aplicaciones clínicas no urgentes.
+\end{itemize}
+
+\section{Trabajo Futuro}
+
+\subsection{Extensiones Inmediatas}
+
+\begin{itemize}
+    \item \textbf{Otros tipos de imágenes:} Aplicar el framework a radiografías periapicales, cefalométricas y otras modalidades.
+    
+    \item \textbf{Optimización de rendimiento:} Paralelización del proceso de optimización y uso de GPUs.
+    
+    \item \textbf{Métricas adicionales:} Incorporar métricas específicas de dominio como detectabilidad de estructuras anatómicas.
+    
+    \item \textbf{Interface gráfica:} Desarrollo de GUI para facilitar el uso por profesionales no técnicos.
+\end{itemize}
+
+\subsection{Investigación a Largo Plazo}
+
+\begin{itemize}
+    \item \textbf{Aprendizaje de preferencias:} Sistemas que aprendan preferencias de usuarios específicos para personalizar la selección MCDM.
+    
+    \item \textbf{Híbridos con Deep Learning:} Combinar el framework con redes neuronales profundas para mejora adicional.
+    
+    \item \textbf{Procesamiento en tiempo real:} Optimización para aplicaciones en tiempo real durante la adquisición de imágenes.
+    
+    \item \textbf{Estudio clínico longitudinal:} Evaluación del impacto en diagnósticos y resultados clínicos a largo plazo.
+    
+    \item \textbf{Otros métodos de optimización:} Comparación con NSGA-II, NSGA-III, MOEA/D y otros algoritmos multiobjetivo.
+    
+    \item \textbf{Análisis de incertidumbre:} Cuantificación de incertidumbre en las selecciones MCDM.
+\end{itemize}
+
+\subsection{Aplicaciones Potenciales}
+
+El framework puede adaptarse a:
+
+\begin{itemize}
+    \item Mejora de otras modalidades de imágenes médicas (CT, MRI, ultrasonido)
+    \item Optimización de parámetros en otros algoritmos de procesamiento
+    \item Problemas de decisión multicriterio en otras áreas médicas
+    \item Sistemas de apoyo a la decisión clínica
+    \item Control de calidad automatizado en radiología
+\end{itemize}
+
+\section{Impacto y Relevancia}
+
+\subsection{Impacto Científico}
+
+Este trabajo contribuye a:
+\begin{itemize}
+    \item Avance en métodos de mejora de imágenes médicas
+    \item Integración novedosa de optimización y MCDM
+    \item Metodología reproducible y extensible
+    \item Base para futuras investigaciones
+\end{itemize}
+
+\subsection{Impacto Clínico}
+
+Potenciales beneficios para la práctica clínica:
+\begin{itemize}
+    \item Mejora en la calidad diagnóstica
+    \item Reducción de errores de interpretación
+    \item Estandarización del procesamiento de imágenes
+    \item Optimización del flujo de trabajo radiológico
+\end{itemize}
+
+\subsection{Impacto Social}
+
+Contribuciones al bienestar social:
+\begin{itemize}
+    \item Mejor atención en salud dental
+    \item Reducción de costos por reexaminaciones
+    \item Accesibilidad mediante software libre
+    \item Educación y entrenamiento de profesionales
+\end{itemize}
+
+\section{Reflexiones Finales}
+
+La integración de técnicas de optimización multiobjetivo con métodos de decisión multicriterio representa un paradigma prometedor para abordar problemas complejos en el procesamiento de imágenes médicas. Este trabajo ha demostrado que es posible desarrollar sistemas automatizados que no solo mejoran significativamente la calidad de las imágenes, sino que también proporcionan múltiples opciones de solución y herramientas para seleccionar la más apropiada según el contexto específico.
+
+El éxito del framework propuesto abre nuevas posibilidades para aplicar enfoques similares a otros desafíos en imágenes médicas y sistemas de apoyo a la decisión clínica, contribuyendo así al avance de la medicina personalizada y la radiología computacional.
