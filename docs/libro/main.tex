@@ -1,0 +1,203 @@
+\documentclass[12pt,letterpaper,twoside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=3cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuración de hiperenlaces
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=blue,
+    pdftitle={Framework CLAHE-MCDM},
+    pdfauthor={Autor},
+}
+
+% Configuración de código
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    language=Python,
+    showstringspaces=false,
+    commentstyle=\color{green!50!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+% Configuración de encabezados
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+
+% Espaciado
+\onehalfspacing
+
+% Información del documento
+\title{Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}
+\author{Nombre del Autor}
+\date{2026}
+
+\begin{document}
+
+% Portada
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    {\LARGE\bfseries UNIVERSIDAD [NOMBRE]\par}
+    \vspace{0.5cm}
+    {\Large FACULTAD DE [NOMBRE]\par}
+    \vspace{0.5cm}
+    {\Large PROGRAMA DE [NOMBRE]\par}
+    
+    \vspace{3cm}
+    
+    {\Huge\bfseries Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo\par}
+    
+    \vspace{3cm}
+    
+    {\Large\itshape Nombre del Autor\par}
+    
+    \vfill
+    
+    {\large Tesis presentada como requisito para optar al título de\\
+    [Maestría en ...]\par}
+    
+    \vspace{1cm}
+    
+    {\large Director: Dr./Mg. [Nombre del Director]\par}
+    
+    \vfill
+    
+    {\large Ciudad, País\par}
+    {\large 2026\par}
+\end{titlepage}
+
+% Página de aprobación
+\chapter*{Nota de Aceptación}
+\addcontentsline{toc}{chapter}{Nota de Aceptación}
+
+\vspace{3cm}
+
+\noindent
+\rule{10cm}{0.5pt}\\
+Firma del Director de Tesis\\
+Dr./Mg. [Nombre]
+
+\vspace{1.5cm}
+
+\noindent
+\rule{10cm}{0.5pt}\\
+Firma del Jurado\\
+Dr./Mg. [Nombre]
+
+\vspace{1.5cm}
+
+\noindent
+\rule{10cm}{0.5pt}\\
+Firma del Jurado\\
+Dr./Mg. [Nombre]
+
+\vspace{2cm}
+
+\noindent
+Ciudad, [Fecha]
+
+\newpage
+
+% Dedicatoria
+\chapter*{Dedicatoria}
+\addcontentsline{toc}{chapter}{Dedicatoria}
+
+\vspace{3cm}
+
+\begin{flushright}
+\textit{[Texto de dedicatoria]}
+\end{flushright}
+
+\newpage
+
+% Agradecimientos
+\chapter*{Agradecimientos}
+\addcontentsline{toc}{chapter}{Agradecimientos}
+
+[Texto de agradecimientos]
+
+\newpage
+
+% Resumen
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+Este trabajo presenta un framework innovador para la mejora de ortopantomografías mediante la integración de técnicas de procesamiento de imágenes, optimización multiobjetivo y métodos de decisión multicriterio. El framework utiliza CLAHE (Contrast Limited Adaptive Histogram Equalization) para el realce de contraste, SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) para la optimización de parámetros, y ocho métodos MCDM (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) para la selección de la mejor imagen mejorada.
+
+Los resultados experimentales demuestran que el framework propuesto mejora significativamente la calidad visual de las ortopantomografías, optimizando simultáneamente múltiples métricas objetivas (entropía, SSIM y VQI). Los métodos MCDM permiten seleccionar la solución más apropiada del Frente de Pareto según las preferencias del usuario, facilitando la toma de decisiones en aplicaciones clínicas.
+
+\textbf{Palabras clave:} CLAHE, Optimización Multiobjetivo, SMPSO, MCDM, Ortopantomografía, Procesamiento de Imágenes Médicas, Frente de Pareto.
+
+\newpage
+
+% Abstract
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This work presents an innovative framework for enhancing orthopantomograms through the integration of image processing techniques, multi-objective optimization, and multi-criteria decision-making methods. The framework uses CLAHE (Contrast Limited Adaptive Histogram Equalization) for contrast enhancement, SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) for parameter optimization, and eight MCDM methods (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) for selecting the best enhanced image.
+
+Experimental results demonstrate that the proposed framework significantly improves the visual quality of orthopantomograms by simultaneously optimizing multiple objective metrics (entropy, SSIM, and VQI). MCDM methods enable selection of the most appropriate solution from the Pareto Front according to user preferences, facilitating decision-making in clinical applications.
+
+\textbf{Keywords:} CLAHE, Multi-objective Optimization, SMPSO, MCDM, Orthopantomogram, Medical Image Processing, Pareto Front.
+
+\newpage
+
+% Tabla de contenidos
+\tableofcontents
+
+% Lista de figuras
+\listoffigures
+
+% Lista de tablas
+\listoftables
+
+\newpage
+
+% Capítulos
+\include{capitulo1}
+\include{capitulo2}
+\include{capitulo3}
+\include{capitulo4}
+\include{capitulo5}
+\include{capitulo6}
+
+% Bibliografía
+\bibliographystyle{plain}
+\bibliography{bibliografia}
+
+% Anexos
+\appendix
+\chapter{Código Fuente}
+
+El código fuente completo del framework está disponible en el repositorio GitHub:\\
+\url{https://github.com/alan0dari/tesis-2026}
+
+\chapter{Datos Experimentales}
+
+[Tablas y gráficos adicionales de experimentos]
+
+\end{document}

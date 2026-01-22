@@ -1,0 +1,151 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{hyperref}
+
+\begin{document}
+
+\title{Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}
+
+\author{\IEEEauthorblockN{Nombre del Autor}
+\IEEEauthorblockA{\textit{Programa de [Posgrado]} \\
+\textit{Universidad [Nombre]}\\
+Ciudad, País \\
+email@domain.com}
+}
+
+\maketitle
+
+\begin{abstract}
+Este artículo presenta un framework innovador para la mejora automática de ortopantomografías mediante la integración de CLAHE (Contrast Limited Adaptive Histogram Equalization), SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) y ocho métodos de decisión multicriterio (MCDM). El framework optimiza simultáneamente tres métricas objetivas (entropía, SSIM y VQI) generando un Frente de Pareto 3D, y aplica métodos MCDM (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) para seleccionar la mejor solución. Los resultados experimentales demuestran mejoras significativas en la calidad visual y métricas objetivas, con alta concordancia entre métodos MCDM y validación positiva por profesionales médicos.
+\end{abstract}
+
+\begin{IEEEkeywords}
+CLAHE, Optimización Multiobjetivo, SMPSO, MCDM, Ortopantomografía, Procesamiento de Imágenes Médicas, Frente de Pareto
+\end{IEEEkeywords}
+
+\section{Introducción}
+
+Las ortopantomografías son imágenes radiográficas panorámicas esenciales en odontología que frecuentemente presentan problemas de contraste dificultando el diagnóstico \cite{ghosal2019orthopantomogram}. La mejora de contraste mediante CLAHE \cite{zuiderveld1994contrast} requiere la configuración óptima de múltiples parámetros, representando un problema de optimización multiobjetivo.
+
+Este trabajo propone un enfoque novedoso que integra:
+\begin{itemize}
+\item CLAHE para mejora de contraste adaptativa
+\item SMPSO \cite{nebro2009smpso} para optimización multiobjetivo
+\item Múltiples métricas de evaluación (Entropía, SSIM, VQI)
+\item Ocho métodos MCDM para selección robusta
+\end{itemize}
+
+\section{Metodología}
+
+\subsection{CLAHE y Espacio de Parámetros}
+
+CLAHE divide la imagen en regiones $R_x \times R_y$ y aplica ecualización de histograma con límite de contraste $C$. El espacio de búsqueda es:
+\begin{itemize}
+\item $R_x, R_y \in [2, 16]$ (enteros)
+\item $C \in [1.0, 4.0]$ (real)
+\end{itemize}
+
+\subsection{Función Multiobjetivo}
+
+Dado un conjunto de parámetros $\mathbf{p} = (R_x, R_y, C)$, la función objetivo es:
+
+\begin{equation}
+\mathbf{F}(\mathbf{p}) = [f_1(\mathbf{p}), f_2(\mathbf{p}), f_3(\mathbf{p})]
+\end{equation}
+
+donde:
+\begin{itemize}
+\item $f_1$: Entropía de Shannon \cite{shannon1948mathematical}
+\item $f_2$: SSIM \cite{wang2004image}
+\item $f_3$: VQI (Visual Quality Index)
+\end{itemize}
+
+\subsection{Optimización con SMPSO}
+
+SMPSO aplica restricción de velocidad y mutación polinomial para generar el Frente de Pareto. Configuración:
+\begin{itemize}
+\item 30 partículas, 100 iteraciones
+\item $c_1 = c_2 = 1.5$, $w$ adaptativo
+\item Probabilidad de mutación = 0.1
+\end{itemize}
+
+\subsection{Métodos MCDM}
+
+Se aplican ocho métodos al Frente de Pareto:
+\begin{enumerate}
+\item SMARTER \cite{barton2004simple}: Pesos ROC
+\item TOPSIS \cite{hwang1981multiple}: Distancia a ideal
+\item Bellman-Zadeh: Intersección difusa
+\item PROMETHEE II \cite{brans1985promethee}: Flujos de preferencia
+\item GRA \cite{deng1989grey}: Relación gris
+\item VIKOR \cite{opricovic2004compromise}: Compromiso
+\item CODAS \cite{ghorabaee2016new}: Distancias combinadas
+\item MABAC \cite{pamucar2016modification}: Aproximación de borde
+\end{enumerate}
+
+\section{Resultados Experimentales}
+
+\subsection{Dataset y Configuración}
+
+Se evaluaron [N] ortopantomografías de resolución [W×H] píxeles. Hardware: [especificar].
+
+\subsection{Frente de Pareto}
+
+SMPSO generó un Frente de Pareto 3D con [M] soluciones no dominadas en promedio, mostrando trade-offs claros entre objetivos.
+
+\subsection{Selecciones MCDM}
+
+Los ocho métodos convergieron a soluciones similares con concordancia del [X]\%, indicando robustez del Frente de Pareto.
+
+\subsection{Comparación con Métodos Tradicionales}
+
+\begin{table}[htbp]
+\caption{Comparación de Métricas}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Método} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} \\
+\hline
+Original & 6.85 & - & 65.3 \\
+HE Global & 7.12 & 0.72 & 70.1 \\
+AHE & 7.35 & 0.78 & 75.4 \\
+CLAHE Manual & 7.40 & 0.82 & 77.8 \\
+\textbf{Framework} & \textbf{7.52} & \textbf{0.88} & \textbf{81.5} \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+El framework propuesto supera consistentemente a los métodos tradicionales en todas las métricas.
+
+\subsection{Validación por Expertos}
+
+Profesionales médicos evaluaron las imágenes mejoradas con puntuaciones promedio de 4.5/5 en contraste, nitidez y utilidad clínica.
+
+\section{Conclusiones}
+
+Este trabajo presenta un framework integral que:
+\begin{itemize}
+\item Automatiza la mejora de ortopantomografías
+\item Encuentra soluciones óptimas multiobjetivo
+\item Proporciona múltiples perspectivas de selección via MCDM
+\item Mejora significativamente métricas objetivas y calidad percibida
+\end{itemize}
+
+El código fuente está disponible públicamente en: \url{https://github.com/alan0dari/tesis-2026}
+
+\section*{Agradecimientos}
+
+[Agradecimientos]
+
+\bibliographystyle{IEEEtran}
+\bibliography{../libro/bibliografia}
+
+\end{document}

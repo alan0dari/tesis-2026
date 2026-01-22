@@ -1,0 +1,178 @@
+\chapter{Marco Teórico: Optimización Multiobjetivo y MCDM}
+
+\section{Optimización Multiobjetivo}
+
+\subsection{Definición del Problema}
+
+Un problema de optimización multiobjetivo (MOP) se define como:
+
+\begin{align*}
+\text{minimizar/maximizar} \quad & \mathbf{F}(\mathbf{x}) = [f_1(\mathbf{x}), f_2(\mathbf{x}), \ldots, f_m(\mathbf{x})]^T \\
+\text{sujeto a} \quad & \mathbf{x} \in \Omega
+\end{align*}
+
+donde $\mathbf{x} \in \mathbb{R}^n$ es el vector de variables de decisión y $\Omega$ es el espacio de búsqueda factible.
+
+\subsection{Dominancia de Pareto}
+
+Una solución $\mathbf{x}_1$ domina a $\mathbf{x}_2$ ($\mathbf{x}_1 \prec \mathbf{x}_2$) si:
+\begin{itemize}
+    \item $f_i(\mathbf{x}_1) \leq f_i(\mathbf{x}_2)$ para todo $i \in \{1,\ldots,m\}$
+    \item $f_j(\mathbf{x}_1) < f_j(\mathbf{x}_2)$ para al menos un $j \in \{1,\ldots,m\}$
+\end{itemize}
+
+\subsection{Frente de Pareto}
+
+El conjunto de soluciones no dominadas forma el \textit{Frente de Pareto}:
+\[
+\mathcal{P} = \{\mathbf{x} \in \Omega \mid \nexists \mathbf{x}' \in \Omega : \mathbf{x}' \prec \mathbf{x}\}
+\]
+
+\section{SMPSO (Speed-constrained Multi-objective PSO)}
+
+\subsection{Particle Swarm Optimization (PSO)}
+
+PSO es un algoritmo de optimización inspirado en el comportamiento social de aves y peces.
+
+\textbf{Ecuaciones de actualización:}
+\begin{align}
+v_i^{t+1} &= w \cdot v_i^t + c_1 r_1 (p_i - x_i^t) + c_2 r_2 (p_g - x_i^t) \\
+x_i^{t+1} &= x_i^t + v_i^{t+1}
+\end{align}
+
+\subsection{Extensión Multiobjetivo: SMPSO}
+
+SMPSO introduce:
+\begin{enumerate}
+    \item \textbf{Restricción de velocidad:} 
+    \[
+    v_{\max} = \frac{x_{\max} - x_{\min}}{2}
+    \]
+    
+    \item \textbf{Archivo externo:} Mantiene soluciones no dominadas
+    
+    \item \textbf{Mutación polinomial:} Mantiene diversidad
+    
+    \item \textbf{Selección de líderes:} Basada en crowding distance
+\end{enumerate}
+
+\section{Métodos de Decisión Multicriterio (MCDM)}
+
+\subsection{Problema de Decisión}
+
+Dado un Frente de Pareto con $n$ alternativas y $m$ criterios, seleccionar la mejor alternativa según preferencias del decisor.
+
+\subsection{SMARTER}
+
+\textbf{Idea:} Función de utilidad aditiva con pesos por ranking.
+
+\[
+U(A_i) = \sum_{j=1}^m w_j \cdot v_{ij}
+\]
+
+Pesos ROC (Rank Order Centroid):
+\[
+w_j = \frac{1}{m} \sum_{k=j}^m \frac{1}{k}
+\]
+
+\subsection{TOPSIS}
+
+\textbf{Idea:} Seleccionar alternativa más cercana a ideal positivo y más lejana de ideal negativo.
+
+\[
+C_i = \frac{D_i^-}{D_i^+ + D_i^-}
+\]
+
+\subsection{Bellman-Zadeh}
+
+\textbf{Idea:} Decisión difusa como intersección de objetivos.
+
+\[
+\mu_D(A_i) = \min_{j} \mu_j(A_i)
+\]
+
+\subsection{PROMETHEE II}
+
+\textbf{Idea:} Flujos de preferencia basados en comparaciones pareadas.
+
+\[
+\phi(a) = \phi^+(a) - \phi^-(a)
+\]
+
+\subsection{GRA (Grey Relational Analysis)}
+
+\textbf{Idea:} Coeficientes de relación gris con respecto a secuencia ideal.
+
+\[
+\xi_{ij} = \frac{\Delta_{\min} + \zeta \Delta_{\max}}{\Delta_{ij} + \zeta \Delta_{\max}}
+\]
+
+\subsection{VIKOR}
+
+\textbf{Idea:} Índice de compromiso considerando utilidad grupal y arrepentimiento.
+
+\[
+Q_i = v \frac{S_i - S^*}{S^- - S^*} + (1-v) \frac{R_i - R^*}{R^- - R^*}
+\]
+
+\subsection{CODAS}
+
+\textbf{Idea:} Distancias Euclidiana y Taxicab desde ideal negativo.
+
+\[
+H_i = E_i + \sum_k \Psi_{ik} T_i
+\]
+
+\subsection{MABAC}
+
+\textbf{Idea:} Distancia al área de aproximación de borde.
+
+\[
+S_i = \sum_j (Q_{ij} - G_j)
+\]
+
+donde $G_j = (\\prod_i Q_{ij})^{1/n}$ es el BAA.
+
+\section{Métricas de Calidad del Frente de Pareto}
+
+\subsection{Hipervolumen}
+
+Volumen del espacio objetivo dominado por el Frente:
+\[
+HV = \text{volumen}(\bigcup_{i=1}^{|\mathcal{P}|} \{y \mid y \preceq \mathbf{F}(x_i)\})
+\]
+
+\subsection{Spacing}
+
+Uniformidad de distribución:
+\[
+S = \sqrt{\frac{1}{n}\sum_{i=1}^n (d_i - \bar{d})^2}
+\]
+
+\subsection{Spread}
+
+Extensión del Frente:
+\[
+\Delta = \frac{d_f + d_l + \sum_{i=1}^{n-1}|d_i - \bar{d}|}{d_f + d_l + (n-1)\bar{d}}
+\]
+
+\section{Integración de Optimización y MCDM}
+
+\subsection{Flujo General}
+
+\begin{enumerate}
+    \item Definir función multiobjetivo
+    \item Ejecutar SMPSO para obtener Frente de Pareto
+    \item Aplicar múltiples métodos MCDM
+    \item Analizar consenso entre métodos
+    \item Seleccionar solución final
+\end{enumerate}
+
+\subsection{Ventajas de la Integración}
+
+\begin{itemize}
+    \item Exploración completa del espacio de soluciones
+    \item Múltiples perspectivas de selección
+    \item Robustez mediante consenso
+    \item Flexibilidad en preferencias
+\end{itemize}

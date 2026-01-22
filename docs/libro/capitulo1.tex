@@ -1,0 +1,116 @@
+\chapter{Introducción}
+
+\section{Contexto y Motivación}
+
+Las ortopantomografías, también conocidas como radiografías panorámicas dentales, son herramientas diagnósticas esenciales en odontología que permiten visualizar la estructura completa de la dentadura, maxilares y estructuras adyacentes en una sola imagen. Sin embargo, estas imágenes a menudo presentan problemas de contraste debido a las limitaciones inherentes del proceso de adquisición, lo que puede dificultar la interpretación diagnóstica precisa.
+
+La mejora del contraste en imágenes médicas es un problema fundamental en el procesamiento de imágenes, especialmente en radiología dental donde la calidad de la imagen impacta directamente en la capacidad del profesional para detectar anomalías, planificar tratamientos y realizar diagnósticos precisos.
+
+\section{Planteamiento del Problema}
+
+Los principales desafíos en la mejora de ortopantomografías incluyen:
+
+\begin{itemize}
+    \item \textbf{Variabilidad en la calidad de imagen:} Las condiciones de adquisición varían entre pacientes y equipos, resultando en imágenes con diferentes niveles de contraste y exposición.
+    
+    \item \textbf{Selección de parámetros óptimos:} Los métodos de mejora como CLAHE requieren la configuración de múltiples parámetros (región contextual, límite de contraste) cuya selección óptima es compleja.
+    
+    \item \textbf{Múltiples objetivos en conflicto:} La mejora debe optimizar simultáneamente varios criterios (entropía, similitud estructural, calidad visual) que pueden estar en conflicto.
+    
+    \item \textbf{Subjetividad en la evaluación:} La percepción de calidad visual varía entre observadores, haciendo necesario un enfoque sistemático para la selección de la mejor imagen mejorada.
+\end{itemize}
+
+\section{Objetivos}
+
+\subsection{Objetivo General}
+
+Desarrollar un framework integral que combine técnicas de procesamiento de imágenes, optimización multiobjetivo y métodos de decisión multicriterio para la mejora y selección automática de ortopantomografías de alta calidad.
+
+\subsection{Objetivos Específicos}
+
+\begin{enumerate}
+    \item Implementar el algoritmo CLAHE con parámetros ajustables para la mejora de contraste en ortopantomografías.
+    
+    \item Desarrollar un sistema de optimización multiobjetivo basado en SMPSO para encontrar configuraciones óptimas de parámetros CLAHE.
+    
+    \item Integrar múltiples métricas de evaluación (entropía, SSIM, VQI) para caracterizar la calidad de las imágenes mejoradas.
+    
+    \item Implementar ocho métodos de decisión multicriterio (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) para la selección de la mejor solución del Frente de Pareto.
+    
+    \item Validar el framework mediante experimentación con imágenes reales y comparación con métodos tradicionales.
+    
+    \item Evaluar la concordancia entre las selecciones de diferentes métodos MCDM y la percepción de profesionales médicos.
+\end{enumerate}
+
+\section{Justificación}
+
+Este trabajo se justifica por las siguientes razones:
+
+\subsection{Relevancia Clínica}
+
+Las ortopantomografías son fundamentales para el diagnóstico y planificación de tratamientos odontológicos. Una mejor calidad de imagen permite:
+\begin{itemize}
+    \item Detección temprana de patologías
+    \item Planificación precisa de implantes dentales
+    \item Evaluación de estructuras maxilofaciales
+    \item Reducción de errores diagnósticos
+\end{itemize}
+
+\subsection{Innovación Metodológica}
+
+La integración de optimización multiobjetivo con múltiples métodos MCDM representa un enfoque novedoso que:
+\begin{itemize}
+    \item Automatiza la selección de parámetros óptimos
+    \item Proporciona múltiples soluciones de compromiso
+    \item Permite incorporar preferencias del usuario
+    \item Ofrece robustez mediante consenso entre métodos
+\end{itemize}
+
+\subsection{Aplicabilidad Práctica}
+
+El framework propuesto es:
+\begin{itemize}
+    \item Independiente del equipo de adquisición
+    \item Escalable a diferentes tipos de imágenes médicas
+    \item Implementable en flujos de trabajo clínicos existentes
+    \item Extensible a otros problemas de optimización multiobjetivo
+\end{itemize}
+
+\section{Alcance y Limitaciones}
+
+\subsection{Alcance}
+
+El presente trabajo abarca:
+\begin{itemize}
+    \item Implementación completa del framework propuesto
+    \item Experimentación con ortopantomografías
+    \item Análisis comparativo de métodos MCDM
+    \item Validación con profesionales médicos
+    \item Documentación y código abierto
+\end{itemize}
+
+\subsection{Limitaciones}
+
+Las limitaciones del estudio incluyen:
+\begin{itemize}
+    \item Enfoque específico en ortopantomografías (aunque extensible)
+    \item Uso de métricas objetivas que pueden no capturar completamente la percepción humana
+    \item Tiempo computacional requerido para la optimización
+    \item Necesidad de validación con conjuntos de datos más amplios
+\end{itemize}
+
+\section{Estructura del Documento}
+
+El resto de este documento está organizado de la siguiente manera:
+
+\begin{description}
+    \item[Capítulo 2:] Marco teórico sobre imágenes médicas, ortopantomografías y técnicas de mejora de contraste.
+    
+    \item[Capítulo 3:] Fundamentos de optimización multiobjetivo, SMPSO y métodos de decisión multicriterio.
+    
+    \item[Capítulo 4:] Metodología propuesta, describiendo la arquitectura del framework y sus componentes.
+    
+    \item[Capítulo 5:] Experimentación y resultados, incluyendo configuración experimental, análisis de resultados y validación.
+    
+    \item[Capítulo 6:] Conclusiones, contribuciones del trabajo y direcciones futuras de investigación.
+\end{description}

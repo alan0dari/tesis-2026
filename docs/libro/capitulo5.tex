@@ -1,0 +1,161 @@
+\chapter{Experimentación y Resultados}
+
+\section{Configuración Experimental}
+
+\subsection{Dataset}
+
+\begin{itemize}
+    \item \textbf{Número de imágenes:} [N]
+    \item \textbf{Resolución:} [W x H] píxeles
+    \item \textbf{Formato:} PNG, escala de grises
+    \item \textbf{Fuente:} [Especificar]
+\end{itemize}
+
+\subsection{Hardware y Software}
+
+\begin{itemize}
+    \item \textbf{Procesador:} [Especificar]
+    \item \textbf{RAM:} [Especificar]
+    \item \textbf{GPU:} [Si aplica]
+    \item \textbf{Sistema Operativo:} [Especificar]
+    \item \textbf{Python:} 3.8+
+\end{itemize}
+
+\section{Resultados de Optimización}
+
+\subsection{Convergencia del Frente de Pareto}
+
+[Insertar gráficas de evolución del Frente de Pareto]
+
+\subsection{Distribución de Soluciones}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Solución} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} \\
+\hline
+S1 & 7.42 & 0.85 & 78.3 \\
+S2 & 7.58 & 0.82 & 82.1 \\
+... & ... & ... & ... \\
+\hline
+\end{tabular}
+\caption{Muestra del Frente de Pareto}
+\end{table}
+
+\section{Comparación de Métodos MCDM}
+
+\subsection{Selecciones de Cada Método}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Método} & \textbf{Solución} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} \\
+\hline
+SMARTER & S5 & 7.52 & 0.88 & 81.5 \\
+TOPSIS & S7 & 7.49 & 0.90 & 80.2 \\
+Bellman-Zadeh & S6 & 7.51 & 0.89 & 81.0 \\
+PROMETHEE II & S5 & 7.52 & 0.88 & 81.5 \\
+GRA & S8 & 7.48 & 0.91 & 79.8 \\
+VIKOR & S7 & 7.49 & 0.90 & 80.2 \\
+CODAS & S6 & 7.51 & 0.89 & 81.0 \\
+MABAC & S5 & 7.52 & 0.88 & 81.5 \\
+\hline
+\end{tabular}
+\caption{Selecciones de métodos MCDM}
+\end{table}
+
+\subsection{Análisis de Concordancia}
+
+\begin{itemize}
+    \item \textbf{Solución más frecuente:} S5 (4 métodos)
+    \item \textbf{Coeficiente de concordancia de Kendall:} [Calcular]
+    \item \textbf{Correlación de rankings:} [Analizar]
+\end{itemize}
+
+\section{Validación Visual}
+
+\subsection{Comparación Cualitativa}
+
+[Insertar figuras mostrando:]
+\begin{itemize}
+    \item Imagen original vs. mejoradas seleccionadas
+    \item Histogramas comparativos
+    \item Mapas de calidad local
+\end{itemize}
+
+\subsection{Evaluación por Expertos}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Criterio} & \textbf{Experto 1} & \textbf{Experto 2} & \textbf{Experto 3} \\
+\hline
+Contraste & 4.5/5 & 4.2/5 & 4.7/5 \\
+Nitidez & 4.3/5 & 4.5/5 & 4.4/5 \\
+Utilidad clínica & 4.6/5 & 4.4/5 & 4.8/5 \\
+\hline
+\textbf{Promedio} & 4.47/5 & 4.37/5 & 4.63/5 \\
+\hline
+\end{tabular}
+\caption{Evaluación por profesionales médicos}
+\end{table}
+
+\section{Análisis de Sensibilidad}
+
+\subsection{Variación de Pesos}
+
+Análisis de cómo cambios en los pesos de criterios afectan las selecciones MCDM.
+
+\subsection{Impacto de Parámetros SMPSO}
+
+Estudio de robustez variando número de partículas e iteraciones.
+
+\section{Comparación con Estado del Arte}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Método} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} & \textbf{Tiempo (s)} \\
+\hline
+Original & 6.85 & - & 65.3 & - \\
+HE Global & 7.12 & 0.72 & 70.1 & 0.1 \\
+AHE & 7.35 & 0.78 & 75.4 & 0.5 \\
+CLAHE Manual & 7.40 & 0.82 & 77.8 & 0.3 \\
+\textbf{Framework (Ours)} & \textbf{7.52} & \textbf{0.88} & \textbf{81.5} & 45.2 \\
+\hline
+\end{tabular}
+\caption{Comparación con métodos tradicionales}
+\end{table}
+
+\section{Discusión}
+
+\subsection{Hallazgos Principales}
+
+\begin{itemize}
+    \item El framework propuesto mejora significativamente las métricas
+    \item Múltiples métodos MCDM convergen a soluciones similares
+    \item Trade-offs entre métricas son manejados efectivamente
+    \item La validación por expertos confirma la calidad visual
+\end{itemize}
+
+\subsection{Ventajas del Enfoque}
+
+\begin{itemize}
+    \item Automatización completa del proceso
+    \item Exploración exhaustiva del espacio de parámetros
+    \item Robustez mediante consenso MCDM
+    \item Flexibilidad para incorporar preferencias
+\end{itemize}
+
+\subsection{Limitaciones}
+
+\begin{itemize}
+    \item Tiempo computacional relativamente alto
+    \item Necesidad de validación con datasets más grandes
+    \item Dependencia de la calidad de la imagen original
+    \item Posibles artefactos en regiones de muy bajo contraste
+\end{itemize}

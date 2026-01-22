@@ -1,0 +1,155 @@
+\chapter{Metodología Propuesta}
+
+\section{Arquitectura del Framework}
+
+El framework propuesto consta de cinco módulos principales:
+
+\begin{enumerate}
+    \item \textbf{Módulo de Procesamiento CLAHE}
+    \item \textbf{Módulo de Métricas de Evaluación}
+    \item \textbf{Módulo de Optimización Multiobjetivo}
+    \item \textbf{Módulo de Métodos MCDM}
+    \item \textbf{Módulo de Visualización}
+\end{enumerate}
+
+\section{Flujo de Trabajo}
+
+\begin{algorithm}
+\caption{Framework CLAHE-MCDM}
+\begin{algorithmic}
+\STATE \textbf{Entrada:} Ortopantomografía $I$
+\STATE \textbf{Salida:} Imagen mejorada óptima $I^*$
+\STATE
+\STATE // Fase 1: Optimización
+\STATE Definir función objetivo $\mathbf{F}(R_x, R_y, C) = [Entropía, SSIM, VQI]$
+\STATE Ejecutar SMPSO con $n$ partículas, $t$ iteraciones
+\STATE Obtener Frente de Pareto $\mathcal{P}$
+\STATE
+\STATE // Fase 2: Selección MCDM
+\STATE Construir matriz de decisión desde $\mathcal{P}$
+\FOR{cada método MCDM $m \in \{$SMARTER, TOPSIS, ..., MABAC$\}$}
+    \STATE Aplicar método $m$
+    \STATE Obtener ranking y mejor solución $s_m$
+\ENDFOR
+\STATE
+\STATE // Fase 3: Consenso
+\STATE Analizar concordancia entre métodos
+\STATE Seleccionar solución final $I^*$
+\STATE \textbf{Retornar} $I^*$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Implementación}
+
+\subsection{Tecnologías Utilizadas}
+
+\begin{itemize}
+    \item \textbf{Lenguaje:} Python 3.8+
+    \item \textbf{Librerías principales:}
+    \begin{itemize}
+        \item NumPy, SciPy: Computación científica
+        \item OpenCV: Procesamiento de imágenes
+        \item scikit-image: Métricas de calidad
+        \item Matplotlib: Visualización
+        \item pandas: Manejo de datos
+    \end{itemize}
+\end{itemize}
+
+\subsection{Estructura del Código}
+
+\begin{lstlisting}[language=bash]
+src/
+├── clahe/          # Procesamiento CLAHE
+├── metrics/        # Métricas (entropía, SSIM, VQI)
+├── optimization/   # SMPSO y Pareto
+├── mcdm/          # 8 métodos MCDM
+└── utils/         # Utilidades
+\end{lstlisting}
+
+\section{Configuración Experimental}
+
+\subsection{Parámetros de CLAHE}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parámetro} & \textbf{Rango} & \textbf{Descripción} \\
+\hline
+$R_x$ & [2, 16] & Regiones horizontales \\
+$R_y$ & [2, 16] & Regiones verticales \\
+$C$ & [1.0, 4.0] & Límite de contraste \\
+\hline
+\end{tabular}
+\caption{Rangos de parámetros CLAHE}
+\end{table}
+
+\subsection{Parámetros de SMPSO}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parámetro} & \textbf{Valor} \\
+\hline
+Partículas & 30 \\
+Iteraciones & 100 \\
+$c_1$ (cognitivo) & 1.5 \\
+$c_2$ (social) & 1.5 \\
+Tamaño archivo & 100 \\
+Probabilidad mutación & 0.1 \\
+\hline
+\end{tabular}
+\caption{Configuración SMPSO}
+\end{table}
+
+\subsection{Pesos de Criterios}
+
+Para métodos MCDM que requieren pesos:
+\begin{itemize}
+    \item $w_1$ (Entropía) = 0.33
+    \item $w_2$ (SSIM) = 0.33
+    \item $w_3$ (VQI) = 0.34
+\end{itemize}
+
+\section{Caso de Uso: Ejemplo Completo}
+
+\begin{lstlisting}[language=Python]
+from clahe.processor import CLAHEProcessor
+from optimization.smpso import SMPSO
+from mcdm.topsis import TOPSIS
+from utils.image_io import load_image
+
+# 1. Cargar imagen
+image = load_image('ortopanto.png')
+
+# 2. Definir función objetivo
+def objective(params):
+    rx, ry, clip = params
+    proc = CLAHEProcessor(rx, ry, clip)
+    enhanced = proc.process(image)
+    
+    entropy = calculate_entropy(enhanced)
+    ssim = calculate_ssim(image, enhanced)
+    vqi = calculate_vqi(enhanced)
+    
+    return [entropy, ssim, vqi]
+
+# 3. Optimizar con SMPSO
+optimizer = SMPSO(
+    n_particles=30,
+    n_iterations=100,
+    bounds=[(2,16), (2,16), (1.0,4.0)]
+)
+pareto = optimizer.optimize(objective)
+
+# 4. Aplicar TOPSIS
+topsis = TOPSIS()
+best_idx, rankings = topsis.select(
+    decision_matrix=pareto
+)
+
+# 5. Obtener imagen óptima
+best_params = pareto[best_idx]['position']
+final = CLAHEProcessor(*best_params).process(image)
+\end{lstlisting}
