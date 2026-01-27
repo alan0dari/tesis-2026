@@ -7,7 +7,7 @@ de secuencias de datos.
 
 import numpy as np
 from numpy.typing import NDArray
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class GRA(MCDMMethod):

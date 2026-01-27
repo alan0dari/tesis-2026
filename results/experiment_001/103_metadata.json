@@ -1,0 +1,30 @@
+{
+  "image_path": "data/dataset/103.jpg",
+  "image_size": [
+    1024,
+    2041
+  ],
+  "degradation_type": "low_contrast",
+  "degradation_params": {
+    "factor": 0.4
+  },
+  "smpso_params": {
+    "n_particles": 15,
+    "max_iterations": 15,
+    "seed": 42
+  },
+  "pareto_size": 61,
+  "compromise_solution": {
+    "parameters": [
+      2.0,
+      17.0,
+      2.253044491812352
+    ],
+    "objectives": [
+      7.357968837965169,
+      0.8281715006539239,
+      57.871890392776805
+    ]
+  },
+  "timestamp": "20260126_142658"
+}

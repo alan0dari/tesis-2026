@@ -7,7 +7,7 @@ PROMETHEE II calcula flujos de preferencia netos para ranking completo de altern
 import numpy as np
 from numpy.typing import NDArray
 from typing import Optional, Callable
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class PROMETHEEII(MCDMMethod):

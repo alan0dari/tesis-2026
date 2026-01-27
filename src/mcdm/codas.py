@@ -7,7 +7,7 @@ basándose en su desviación de la solución ideal negativa.
 
 import numpy as np
 from numpy.typing import NDArray
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class CODAS(MCDMMethod):

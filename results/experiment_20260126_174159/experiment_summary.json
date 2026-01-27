@@ -1,0 +1,32 @@
+{
+  "timestamp": "20260126_174159",
+  "config": {
+    "data_dir": "data\\original",
+    "sample_size": 5,
+    "actual_processed": 0,
+    "particles": 50,
+    "iterations": 25,
+    "workers": 1,
+    "seed": 42,
+    "weights": [
+      0.4,
+      0.35,
+      0.25
+    ]
+  },
+  "results": {
+    "successful": 0,
+    "failed": 5,
+    "failed_images": [
+      "205",
+      "125",
+      "341",
+      "155",
+      "74"
+    ]
+  },
+  "analysis": {
+    "error": "No hay resultados para analizar"
+  },
+  "total_time_seconds": 0.5886616706848145
+}

@@ -67,7 +67,7 @@ def calculate_vqi(
         if image.shape != reference_image.shape:
             raise ValueError("La imagen y la referencia deben tener la misma forma")
         
-        from metrics.ssim import calculate_ssim
+        from src.metrics.ssim import calculate_ssim
         ssim_score = calculate_ssim(reference_image, image)
         
         # VQI con referencia: combinación ponderada
@@ -96,7 +96,7 @@ def _calculate_local_contrast(
     Calcula el contraste local promedio de la imagen.
     
     El contraste local se mide como la desviación estándar en bloques
-    de la imagen.
+    de la imagen. Utiliza operaciones vectorizadas para eficiencia.
     
     Args:
         image: Imagen en formato float.
@@ -105,23 +105,23 @@ def _calculate_local_contrast(
     Returns:
         Puntuación de contraste normalizada [0, 100].
     """
-    h, w = image.shape
-    contrasts = []
+    from scipy import ndimage
     
-    # Dividir imagen en bloques
-    for i in range(0, h - block_size + 1, block_size):
-        for j in range(0, w - block_size + 1, block_size):
-            block = image[i:i+block_size, j:j+block_size]
-            
-            # Contraste como desviación estándar
-            contrast = np.std(block)
-            contrasts.append(contrast)
+    # Calcular media local usando filtro uniforme (más rápido)
+    local_mean = ndimage.uniform_filter(image, size=block_size)
     
-    if not contrasts:
-        return 0.0
+    # Calcular varianza local: E[X^2] - E[X]^2
+    local_sqr_mean = ndimage.uniform_filter(image**2, size=block_size)
+    local_variance = local_sqr_mean - local_mean**2
     
-    # Contraste promedio normalizado
-    mean_contrast = np.mean(contrasts)
+    # Evitar valores negativos por errores numéricos
+    local_variance = np.maximum(local_variance, 0)
+    
+    # Desviación estándar local
+    local_std = np.sqrt(local_variance)
+    
+    # Contraste promedio
+    mean_contrast = np.mean(local_std)
     
     # Normalizar a escala 0-100 (asumiendo std máxima de ~75 para uint8)
     normalized_contrast = min(100, (mean_contrast / 75.0) * 100)
@@ -174,7 +174,7 @@ def _calculate_intensity_distribution(image: NDArray[np.uint8]) -> float:
     Returns:
         Puntuación de distribución normalizada [0, 100].
     """
-    from metrics.entropy import calculate_entropy_normalized
+    from src.metrics.entropy import calculate_entropy_normalized
     
     # Entropía normalizada como medida de distribución
     entropy_norm = calculate_entropy_normalized(image)
@@ -225,7 +225,7 @@ def calculate_vqi_components(
     }
     
     if reference_image is not None:
-        from metrics.ssim import calculate_ssim
+        from src.metrics.ssim import calculate_ssim
         ssim = calculate_ssim(reference_image, image)
         components['ssim'] = ssim * 100
         

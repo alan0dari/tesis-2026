@@ -70,47 +70,95 @@ src/
 
 \subsection{Parámetros de CLAHE}
 
+El espacio de búsqueda de CLAHE está definido por tres parámetros que determinan 
+el comportamiento del algoritmo de mejora de contraste:
+
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|c|l|l|}
 \hline
-\textbf{Parámetro} & \textbf{Rango} & \textbf{Descripción} \\
+\textbf{Parámetro} & \textbf{Rango} & \textbf{Valores} & \textbf{Descripción} \\
 \hline
-$R_x$ & [2, 16] & Regiones horizontales \\
-$R_y$ & [2, 16] & Regiones verticales \\
-$C$ & [1.0, 4.0] & Límite de contraste \\
+$R_x$ & [2, 64] & 63 enteros & Regiones contextuales (filas) \\
+$R_y$ & [2, 64] & 63 enteros & Regiones contextuales (columnas) \\
+$C$ (clip limit) & [1.0, 4.0] & Continuo & Límite de contraste local \\
 \hline
 \end{tabular}
-\caption{Rangos de parámetros CLAHE}
+\caption{Rangos de parámetros CLAHE para optimización}
+\label{tab:clahe_params}
 \end{table}
+
+El espacio de búsqueda total comprende aproximadamente:
+\begin{equation}
+|\Omega| = 63 \times 63 \times 301 \approx 1,195,000 \text{ combinaciones}
+\end{equation}
+
+donde 301 representa la discretización del clip limit con resolución de 0.01.
 
 \subsection{Parámetros de SMPSO}
 
+La configuración del algoritmo SMPSO se seleccionó para garantizar una exploración
+exhaustiva del espacio de búsqueda, siguiendo las recomendaciones de 
+\citet{coello2007evolutionary} para optimización multiobjetivo:
+
 \begin{table}[h]
 \centering
-\begin{tabular}{|l|l|}
+\begin{tabular}{|l|c|l|}
 \hline
-\textbf{Parámetro} & \textbf{Valor} \\
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Justificación} \\
 \hline
-Partículas & 30 \\
-Iteraciones & 100 \\
-$c_1$ (cognitivo) & 1.5 \\
-$c_2$ (social) & 1.5 \\
-Tamaño archivo & 100 \\
-Probabilidad mutación & 0.1 \\
+Partículas ($n$) & 500 & $\approx 10\text{-}20 \times$ dimensiones \\
+Iteraciones ($t$) & 250 & Convergencia completa \\
+$c_1$ (cognitivo) & 1.5 & Balance exploración/explotación \\
+$c_2$ (social) & 1.5 & Valor estándar \\
+$w_{max}$ (inercia inicial) & 0.9 & Mayor exploración inicial \\
+$w_{min}$ (inercia final) & 0.4 & Mayor explotación final \\
+Tamaño archivo & 500 & $\geq n$ para preservar diversidad \\
+Prob. mutación & 0.1 & Mantener diversidad \\
 \hline
 \end{tabular}
-\caption{Configuración SMPSO}
+\caption{Configuración SMPSO para cobertura exhaustiva}
+\label{tab:smpso_config}
 \end{table}
 
-\subsection{Pesos de Criterios}
+Con esta configuración, el número total de evaluaciones de la función objetivo es:
+\begin{equation}
+\text{Evaluaciones} = n \times t = 500 \times 250 = 125,000
+\end{equation}
 
-Para métodos MCDM que requieren pesos:
+Esto representa aproximadamente el 10.5\% del espacio de búsqueda total,
+lo cual es suficiente para que SMPSO converja al verdadero Frente de Pareto 
+\citep{nebro2009smpso}.
+
+\subsection{Pesos de Criterios para MCDM}
+
+Para métodos MCDM que requieren pesos, se utilizan valores que reflejan
+la importancia relativa de cada métrica en el contexto de imágenes médicas:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Criterio} & \textbf{Peso} & \textbf{Justificación} \\
+\hline
+$w_1$ (Entropía) & 0.40 & Detalle e información diagnóstica \\
+$w_2$ (SSIM) & 0.35 & Preservación de estructuras anatómicas \\
+$w_3$ (VQI) & 0.25 & Calidad visual percibida \\
+\hline
+\end{tabular}
+\caption{Pesos de criterios para métodos MCDM}
+\label{tab:mcdm_weights}
+\end{table}
+
+Los pesos fueron determinados considerando:
 \begin{itemize}
-    \item $w_1$ (Entropía) = 0.33
-    \item $w_2$ (SSIM) = 0.33
-    \item $w_3$ (VQI) = 0.34
+    \item La entropía tiene mayor peso porque el objetivo principal es
+          maximizar la información visible para diagnóstico.
+    \item El SSIM es crítico para no distorsionar estructuras anatómicas.
+    \item El VQI complementa la evaluación con percepción visual humana.
 \end{itemize}
+
+Todos los criterios son de tipo \textit{beneficio} (maximización).
 
 \section{Caso de Uso: Ejemplo Completo}
 

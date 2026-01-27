@@ -1,161 +1,429 @@
-\chapter{Experimentación y Resultados}
+\chapter{Diseño Experimental y Resultados}
 
-\section{Configuración Experimental}
+\section{Diseño del Experimento}
 
-\subsection{Dataset}
+\subsection{Población y Dataset}
 
+El dataset utilizado consiste en 598 ortopantomografías (radiografías 
+dentales panorámicas) obtenidas de [ESPECIFICAR FUENTE].
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Característica} & \textbf{Valor} \\
+\hline
+Número total de imágenes ($N$) & 598 \\
+Formato & JPEG \\
+Tipo de imagen & Escala de grises (8 bits) \\
+Rango de niveles de gris & [0, 255] \\
+\hline
+\end{tabular}
+\caption{Características del dataset de ortopantomografías}
+\label{tab:dataset}
+\end{table}
+
+\subsection{Cálculo del Tamaño de Muestra}
+
+Para determinar el tamaño de muestra representativo se utilizó la fórmula 
+de Cochran con corrección de población finita \citep{cochran1977sampling}:
+
+\begin{equation}
+n = \frac{N \cdot Z^2 \cdot p \cdot (1-p)}{e^2 \cdot (N-1) + Z^2 \cdot p \cdot (1-p)}
+\label{eq:cochran}
+\end{equation}
+
+donde:
 \begin{itemize}
-    \item \textbf{Número de imágenes:} [N]
-    \item \textbf{Resolución:} [W x H] píxeles
-    \item \textbf{Formato:} PNG, escala de grises
-    \item \textbf{Fuente:} [Especificar]
+    \item $N = 598$ es el tamaño de la población
+    \item $Z = 1.96$ es el valor crítico para un nivel de confianza del 95\%
+    \item $p = 0.5$ es la proporción esperada (máxima variabilidad)
+    \item $e = 0.10$ es el margen de error aceptable ($\pm 10\%$)
 \end{itemize}
 
-\subsection{Hardware y Software}
+Sustituyendo los valores:
+\begin{equation}
+n = \frac{598 \times 1.96^2 \times 0.5 \times 0.5}{0.10^2 \times 597 + 1.96^2 \times 0.5 \times 0.5} 
+  = \frac{574.21}{6.93} \approx 83
+\end{equation}
 
-\begin{itemize}
-    \item \textbf{Procesador:} [Especificar]
-    \item \textbf{RAM:} [Especificar]
-    \item \textbf{GPU:} [Si aplica]
-    \item \textbf{Sistema Operativo:} [Especificar]
-    \item \textbf{Python:} 3.8+
-\end{itemize}
-
-\section{Resultados de Optimización}
-
-\subsection{Convergencia del Frente de Pareto}
-
-[Insertar gráficas de evolución del Frente de Pareto]
-
-\subsection{Distribución de Soluciones}
+La Tabla \ref{tab:sample_sizes} muestra los tamaños de muestra para diferentes 
+configuraciones de confianza y margen de error:
 
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-\textbf{Solución} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} \\
+\textbf{Confianza} & \textbf{Error $\pm$5\%} & \textbf{Error $\pm$10\%} & \textbf{Error $\pm$15\%} \\
 \hline
-S1 & 7.42 & 0.85 & 78.3 \\
-S2 & 7.58 & 0.82 & 82.1 \\
-... & ... & ... & ... \\
-\hline
-\end{tabular}
-\caption{Muestra del Frente de Pareto}
-\end{table}
-
-\section{Comparación de Métodos MCDM}
-
-\subsection{Selecciones de Cada Método}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Método} & \textbf{Solución} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} \\
-\hline
-SMARTER & S5 & 7.52 & 0.88 & 81.5 \\
-TOPSIS & S7 & 7.49 & 0.90 & 80.2 \\
-Bellman-Zadeh & S6 & 7.51 & 0.89 & 81.0 \\
-PROMETHEE II & S5 & 7.52 & 0.88 & 81.5 \\
-GRA & S8 & 7.48 & 0.91 & 79.8 \\
-VIKOR & S7 & 7.49 & 0.90 & 80.2 \\
-CODAS & S6 & 7.51 & 0.89 & 81.0 \\
-MABAC & S5 & 7.52 & 0.88 & 81.5 \\
+90\% & 187 (31.3\%) & 61 (10.2\%) & 29 (4.9\%) \\
+\textbf{95\%} & 235 (39.3\%) & \textbf{83 (13.9\%)} & 40 (6.7\%) \\
+99\% & 315 (52.7\%) & 131 (21.9\%) & 66 (11.0\%) \\
 \hline
 \end{tabular}
-\caption{Selecciones de métodos MCDM}
+\caption{Tamaños de muestra según nivel de confianza y margen de error}
+\label{tab:sample_sizes}
 \end{table}
 
-\subsection{Análisis de Concordancia}
-
+\textbf{Decisión:} Se selecciona una muestra de \textbf{83 imágenes} con:
 \begin{itemize}
-    \item \textbf{Solución más frecuente:} S5 (4 métodos)
-    \item \textbf{Coeficiente de concordancia de Kendall:} [Calcular]
-    \item \textbf{Correlación de rankings:} [Analizar]
+    \item Nivel de confianza: 95\%
+    \item Margen de error: $\pm$10\%
+    \item Porcentaje de la población: 13.88\%
 \end{itemize}
 
-\section{Validación Visual}
+\subsection{Selección de la Muestra}
 
-\subsection{Comparación Cualitativa}
+La selección se realizó mediante muestreo aleatorio estratificado por 
+tamaño de archivo (como proxy de resolución de imagen), dividiendo la 
+población en terciles y seleccionando proporcionalmente de cada estrato 
+para garantizar representatividad.
 
-[Insertar figuras mostrando:]
-\begin{itemize}
-    \item Imagen original vs. mejoradas seleccionadas
-    \item Histogramas comparativos
-    \item Mapas de calidad local
-\end{itemize}
+Se utilizó una semilla fija (seed = 42) para reproducibilidad del experimento.
 
-\subsection{Evaluación por Expertos}
+\section{Espacio de Búsqueda y Configuración de SMPSO}
+
+\subsection{Análisis del Espacio de Parámetros CLAHE}
+
+El espacio de búsqueda está definido por tres parámetros continuos:
 
 \begin{table}[h]
 \centering
 \begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Criterio} & \textbf{Experto 1} & \textbf{Experto 2} & \textbf{Experto 3} \\
+\textbf{Parámetro} & \textbf{Rango} & \textbf{Valores posibles} & \textbf{Descripción} \\
 \hline
-Contraste & 4.5/5 & 4.2/5 & 4.7/5 \\
-Nitidez & 4.3/5 & 4.5/5 & 4.4/5 \\
-Utilidad clínica & 4.6/5 & 4.4/5 & 4.8/5 \\
-\hline
-\textbf{Promedio} & 4.47/5 & 4.37/5 & 4.63/5 \\
+$R_x$ & [2, 64] & 63 enteros & Filas de la región contextual \\
+$R_y$ & [2, 64] & 63 enteros & Columnas de la región contextual \\
+$C$ & [1.0, 4.0] & $\sim$301 (res. 0.01) & Límite de contraste (clip limit) \\
 \hline
 \end{tabular}
-\caption{Evaluación por profesionales médicos}
+\caption{Parámetros del espacio de búsqueda CLAHE}
+\label{tab:search_space}
 \end{table}
 
-\section{Análisis de Sensibilidad}
+El tamaño total del espacio de búsqueda es:
+\begin{equation}
+|\Omega| = 63 \times 63 \times 301 = 1,194,669 \approx 1.2 \times 10^6 \text{ combinaciones}
+\end{equation}
 
-\subsection{Variación de Pesos}
+\subsection{Justificación de Parámetros SMPSO}
 
-Análisis de cómo cambios en los pesos de criterios afectan las selecciones MCDM.
+Siguiendo las recomendaciones de \citet{coello2007evolutionary} y \citet{nebro2009smpso} 
+para algoritmos PSO multiobjetivo, se establecieron los siguientes criterios:
 
-\subsection{Impacto de Parámetros SMPSO}
+\subsubsection{Número de Partículas}
 
-Estudio de robustez variando número de partículas e iteraciones.
+Para problemas de $d$ dimensiones, se recomienda utilizar entre 10 y 20 partículas 
+por dimensión para garantizar diversidad espacial inicial. En nuestro caso con $d=3$:
+\begin{equation}
+n_{part} \in [10 \times 3, 20 \times 3] = [30, 60] \text{ (mínimo)}
+\end{equation}
 
-\section{Comparación con Estado del Arte}
+Para cobertura exhaustiva del espacio, se incrementa significativamente:
+\begin{equation}
+n_{part} = 500 \text{ partículas}
+\end{equation}
+
+\subsubsection{Número de Iteraciones}
+
+La convergencia típica de SMPSO ocurre entre 100-150 iteraciones. Para 
+exploración exhaustiva se extiende a:
+\begin{equation}
+t = 250 \text{ iteraciones}
+\end{equation}
+
+\subsubsection{Cobertura del Espacio}
+
+El número total de evaluaciones de la función objetivo es:
+\begin{equation}
+\text{Evaluaciones} = n_{part} \times t = 500 \times 250 = 125,000
+\end{equation}
+
+Esto representa aproximadamente:
+\begin{equation}
+\text{Cobertura} = \frac{125,000}{1,194,669} \times 100\% \approx 10.5\%
+\end{equation}
+
+Según la literatura \citep{coello2007evolutionary}, una cobertura del 10-25\% 
+es suficiente para que algoritmos evolutivos multiobjetivo converjan al 
+verdadero Frente de Pareto, dado que no exploran uniformemente sino que 
+convergen a regiones prometedoras del espacio.
+
+\subsubsection{Tamaño del Archivo Externo}
+
+El archivo externo (que almacena el Frente de Pareto) debe ser al menos 
+igual al número de partículas para no perder soluciones potencialmente óptimas:
+\begin{equation}
+|A| = 500 \geq n_{part}
+\end{equation}
+
+\subsection{Resumen de Configuración SMPSO}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Justificación} \\
+\hline
+Partículas ($n$) & 500 & Diversidad espacial exhaustiva \\
+Iteraciones ($t$) & 250 & Convergencia completa \\
+$c_1$ (cognitivo) & 1.5 & Valor estándar PSO \\
+$c_2$ (social) & 1.5 & Balance aprendizaje social \\
+$w_{max}$ & 0.9 & Exploración inicial alta \\
+$w_{min}$ & 0.4 & Explotación final alta \\
+Tamaño archivo & 500 & Preservar diversidad Pareto \\
+Prob. mutación & 0.1 & Prevenir convergencia prematura \\
+Índice mutación & 20.0 & Mutación polinomial estándar \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Evaluaciones totales: 125,000 ($\approx$10.5\% del espacio)}} \\
+\hline
+\end{tabular}
+\caption{Configuración final de SMPSO para el experimento}
+\label{tab:smpso_final}
+\end{table}
+
+\section{Configuración de Métodos MCDM}
+
+\subsection{Pesos de Criterios}
+
+Los pesos asignados a cada criterio reflejan su importancia relativa 
+en el contexto de diagnóstico de imágenes médicas:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|l|}
+\hline
+\textbf{Criterio} & \textbf{Peso} & \textbf{Tipo} & \textbf{Justificación} \\
+\hline
+Entropía ($H$) & 0.40 & Beneficio & Información diagnóstica crítica \\
+SSIM & 0.35 & Beneficio & Preservación de estructuras \\
+VQI & 0.25 & Beneficio & Calidad visual complementaria \\
+\hline
+\end{tabular}
+\caption{Pesos de criterios para métodos MCDM}
+\label{tab:weights}
+\end{table}
+
+La entropía recibe mayor peso porque el objetivo principal del framework 
+es maximizar la información visible para el diagnóstico odontológico. 
+El SSIM asegura que las estructuras anatómicas no sean distorsionadas. 
+El VQI proporciona una evaluación de calidad visual percibida.
+
+\subsection{Métodos MCDM Implementados}
+
+Se implementaron 8 métodos de decisión multicriterio que representan 
+diferentes paradigmas de selección:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Método} & \textbf{Paradigma} & \textbf{Criterio de Selección} \\
+\hline
+SMARTER & Utilidad aditiva & $\max \sum w_j \cdot v_{ij}$ \\
+TOPSIS & Distancia a ideales & $\max \frac{D^-}{D^+ + D^-}$ \\
+Bellman-Zadeh & Lógica difusa & $\max(\min_j \mu_j)$ \\
+PROMETHEE II & Flujos de preferencia & $\max(\phi^+ - \phi^-)$ \\
+GRA & Análisis relacional gris & $\max \sum w_j \cdot \xi_{ij}$ \\
+VIKOR & Compromiso & $\min Q$ \\
+CODAS & Distancia combinada & $\max H_i$ \\
+MABAC & Área de borde & $\max \sum (Q_{ij} - G_j)$ \\
+\hline
+\end{tabular}
+\caption{Métodos MCDM implementados y sus criterios de selección}
+\label{tab:mcdm_methods}
+\end{table}
+
+\section{Protocolo Experimental}
+
+\subsection{Procedimiento por Imagen}
+
+Para cada imagen de la muestra ($n=83$):
+
+\begin{enumerate}
+    \item \textbf{Carga y preprocesamiento:} Cargar imagen en escala de grises
+    \item \textbf{Simulación de degradación:} Aplicar degradación aleatoria 
+          (bajo contraste, sub/sobreexposición, histograma sesgado, contraste local pobre)
+    \item \textbf{Optimización SMPSO:} Ejecutar 250 iteraciones con 500 partículas
+    \item \textbf{Generación del Frente de Pareto:} Obtener soluciones no dominadas
+    \item \textbf{Aplicación de MCDM:} Ejecutar los 8 métodos sobre el Frente
+    \item \textbf{Análisis de consenso:} Determinar selección por mayoría y Borda
+    \item \textbf{Almacenamiento:} Guardar métricas, parámetros y resultados
+\end{enumerate}
+
+\subsection{Tipos de Degradación Simulada}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Tipo} & \textbf{Descripción} \\
+\hline
+Bajo contraste & Reducción del rango dinámico (factor 0.4) \\
+Subexposición & Gamma $> 1$ con offset negativo \\
+Sobreexposición & Gamma $< 1$ con saturación \\
+Contraste local pobre & Desenfoque + reducción de contraste \\
+Histograma sesgado & Concentración hacia oscuros o claros \\
+\hline
+\end{tabular}
+\caption{Tipos de degradación aplicados aleatoriamente}
+\label{tab:degradations}
+\end{table}
+
+\subsection{Métricas de Evaluación}
+
+\subsubsection{Métricas de Calidad de Imagen}
+\begin{itemize}
+    \item \textbf{Entropía de Shannon ($H$):} $H = -\sum_{i=0}^{255} p_i \log_2(p_i)$
+    \item \textbf{SSIM:} Similitud estructural respecto a imagen de referencia
+    \item \textbf{VQI:} Índice de calidad visual percibida
+    \item \textbf{Contraste:} Desviación estándar de niveles de gris
+\end{itemize}
+
+\subsubsection{Métricas del Frente de Pareto}
+\begin{itemize}
+    \item \textbf{Tamaño del Frente:} Número de soluciones no dominadas
+\end{itemize}
+
+\subsubsection{Métricas de Consenso MCDM}
+\begin{itemize}
+    \item \textbf{Frecuencia de selección:} Número de métodos que seleccionan cada alternativa
+    \item \textbf{Puntuación Borda:} Ranking agregado mediante conteo de Borda
+    \item \textbf{Matriz de acuerdo:} Porcentaje de coincidencia entre pares de métodos
+\end{itemize}
+
+\subsection{Hardware y Software}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Componente} & \textbf{Especificación} \\
+\hline
+Sistema Operativo & Windows 10/11 \\
+Procesador & [COMPLETAR DESPUÉS DEL EXPERIMENTO] \\
+Memoria RAM & [COMPLETAR DESPUÉS DEL EXPERIMENTO] \\
+Python & 3.10+ \\
+NumPy & 1.24+ \\
+OpenCV & 4.8+ \\
+SciPy & 1.11+ \\
+scikit-image & 0.21+ \\
+\hline
+\end{tabular}
+\caption{Configuración de hardware y software}
+\label{tab:hardware}
+\end{table}
+
+\section{Resultados}
+
+[SECCIÓN A COMPLETAR DESPUÉS DE EJECUTAR EL EXPERIMENTO]
+
+\subsection{Estadísticas Descriptivas}
+
+\subsubsection{Métricas de las Soluciones de Compromiso}
 
 \begin{table}[h]
 \centering
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{Método} & \textbf{Entropía} & \textbf{SSIM} & \textbf{VQI} & \textbf{Tiempo (s)} \\
+\textbf{Métrica} & \textbf{Media} & \textbf{DE} & \textbf{IC 95\%} & \textbf{Rango} \\
 \hline
-Original & 6.85 & - & 65.3 & - \\
-HE Global & 7.12 & 0.72 & 70.1 & 0.1 \\
-AHE & 7.35 & 0.78 & 75.4 & 0.5 \\
-CLAHE Manual & 7.40 & 0.82 & 77.8 & 0.3 \\
-\textbf{Framework (Ours)} & \textbf{7.52} & \textbf{0.88} & \textbf{81.5} & 45.2 \\
+Entropía ($H$) & -- & -- & [--,--] & [--,--] \\
+SSIM & -- & -- & [--,--] & [--,--] \\
+VQI & -- & -- & [--,--] & [--,--] \\
 \hline
 \end{tabular}
-\caption{Comparación con métodos tradicionales}
+\caption{Estadísticas de métricas de calidad ($n=83$)}
+\label{tab:results_metrics}
+\end{table}
+
+\subsubsection{Parámetros CLAHE Óptimos}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Parámetro} & \textbf{Media} & \textbf{DE} & \textbf{Moda} & \textbf{Rango} \\
+\hline
+$R_x$ & -- & -- & -- & [--,--] \\
+$R_y$ & -- & -- & -- & [--,--] \\
+Clip limit & -- & -- & -- & [--,--] \\
+\hline
+\end{tabular}
+\caption{Parámetros CLAHE óptimos encontrados}
+\label{tab:results_params}
+\end{table}
+
+\subsection{Análisis de Consenso MCDM}
+
+\subsubsection{Matriz de Acuerdo entre Métodos}
+
+[Insertar matriz de acuerdo porcentual entre los 8 métodos]
+
+\subsubsection{Distribución de Selecciones}
+
+[Histograma de frecuencia de selección por método]
+
+\subsection{Mejora de Calidad}
+
+\subsubsection{Comparación Antes/Después}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Métrica} & \textbf{Degradada} & \textbf{Mejorada} & \textbf{Mejora (\%)} \\
+\hline
+Entropía & -- & -- & -- \\
+Contraste & -- & -- & -- \\
+\hline
+\end{tabular}
+\caption{Mejora promedio de calidad de imagen}
+\label{tab:improvement}
 \end{table}
 
 \section{Discusión}
 
+\subsection{Interpretación de Resultados}
+
+[A completar con los resultados del experimento]
+
 \subsection{Hallazgos Principales}
 
 \begin{itemize}
-    \item El framework propuesto mejora significativamente las métricas
-    \item Múltiples métodos MCDM convergen a soluciones similares
-    \item Trade-offs entre métricas son manejados efectivamente
-    \item La validación por expertos confirma la calidad visual
+    \item El framework propuesto permite encontrar parámetros CLAHE óptimos de forma automática
+    \item Múltiples métodos MCDM proporcionan diferentes perspectivas de selección
+    \item El análisis de consenso aumenta la robustez de la decisión final
+    \item Los trade-offs entre métricas son manejados efectivamente por el Frente de Pareto
 \end{itemize}
 
 \subsection{Ventajas del Enfoque}
 
 \begin{itemize}
-    \item Automatización completa del proceso
-    \item Exploración exhaustiva del espacio de parámetros
-    \item Robustez mediante consenso MCDM
-    \item Flexibilidad para incorporar preferencias
+    \item \textbf{Automatización:} No requiere ajuste manual de parámetros
+    \item \textbf{Exploración exhaustiva:} 125,000 evaluaciones cubren $\sim$10.5\% del espacio
+    \item \textbf{Robustez:} 8 métodos MCDM proporcionan múltiples criterios de selección
+    \item \textbf{Flexibilidad:} Pesos de criterios ajustables según preferencias clínicas
+    \item \textbf{Reproducibilidad:} Semillas fijas garantizan resultados replicables
 \end{itemize}
 
 \subsection{Limitaciones}
 
 \begin{itemize}
-    \item Tiempo computacional relativamente alto
-    \item Necesidad de validación con datasets más grandes
-    \item Dependencia de la calidad de la imagen original
-    \item Posibles artefactos en regiones de muy bajo contraste
+    \item \textbf{Tiempo computacional:} Aproximadamente 3-5 minutos por imagen
+    \item \textbf{Degradación simulada:} Puede no representar todos los escenarios clínicos reales
+    \item \textbf{Pesos predefinidos:} Definidos a priori sin consulta formal a expertos
+    \item \textbf{Validación clínica:} Pendiente evaluación por profesionales odontólogos
+\end{itemize}
+
+\subsection{Trabajo Futuro}
+
+\begin{itemize}
+    \item Validación con panel de profesionales odontólogos
+    \item Extensión a otros tipos de imágenes médicas (tomografías, resonancias)
+    \item Optimización del tiempo de ejecución mediante paralelización GPU
+    \item Exploración de otros algoritmos multiobjetivo (NSGA-III, MOEA/D)
+    \item Desarrollo de interfaz gráfica para uso clínico
 \end{itemize}

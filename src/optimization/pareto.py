@@ -6,10 +6,301 @@ donde ninguna solución es dominada por otra.
 """
 
 from typing import List, Dict, Tuple, Optional
+from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import NDArray
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+
+@dataclass
+class Solution:
+    """
+    Representa una solución en el espacio de optimización.
+    
+    Attributes:
+        parameters: Parámetros de CLAHE [R_x, R_y, clip_limit].
+        objectives: Valores de las funciones objetivo [entropía, SSIM, VQI].
+        crowding_distance: Distancia de apiñamiento para diversidad.
+    """
+    parameters: NDArray[np.float64]
+    objectives: NDArray[np.float64]
+    crowding_distance: float = 0.0
+    
+    def to_dict(self) -> Dict:
+        """Convierte la solución a diccionario."""
+        return {
+            'position': self.parameters.copy(),
+            'objectives': self.objectives.copy(),
+            'crowding_distance': self.crowding_distance
+        }
+
+
+class ParetoFront:
+    """
+    Clase para gestionar el Frente de Pareto en optimización multiobjetivo.
+    
+    El Frente de Pareto contiene soluciones no dominadas, donde ninguna
+    solución es mejor que otra en todos los objetivos simultáneamente.
+    
+    Attributes:
+        solutions: Lista de soluciones no dominadas.
+        max_size: Tamaño máximo del frente (para podar por crowding distance).
+        maximize: Si True, maximiza los objetivos; si False, minimiza.
+    
+    Examples:
+        >>> front = ParetoFront(max_size=100, maximize=True)
+        >>> solution = Solution(
+        ...     parameters=np.array([8, 8, 2.0]),
+        ...     objectives=np.array([7.5, 0.95, 85.0])
+        ... )
+        >>> front.add(solution)
+        >>> print(f"Soluciones en el frente: {len(front)}")
+    """
+    
+    def __init__(self, max_size: int = 100, maximize: bool = True):
+        """
+        Inicializa el Frente de Pareto.
+        
+        Args:
+            max_size: Tamaño máximo del archivo externo.
+            maximize: Si True, asume maximización de objetivos.
+        """
+        self.solutions: List[Solution] = []
+        self.max_size = max_size
+        self.maximize = maximize
+    
+    def __len__(self) -> int:
+        """Retorna el número de soluciones en el frente."""
+        return len(self.solutions)
+    
+    def __iter__(self):
+        """Permite iterar sobre las soluciones."""
+        return iter(self.solutions)
+    
+    def __getitem__(self, index: int) -> Solution:
+        """Permite acceso por índice."""
+        return self.solutions[index]
+    
+    def add(self, solution: Solution) -> bool:
+        """
+        Agrega una solución al frente si no es dominada.
+        
+        Args:
+            solution: Solución a agregar.
+        
+        Returns:
+            True si la solución fue agregada, False si fue dominada.
+        """
+        # Verificar si la solución es dominada por alguna existente
+        dominated_indices = []
+        
+        for i, existing in enumerate(self.solutions):
+            if self._dominates(existing.objectives, solution.objectives):
+                return False  # La nueva solución es dominada
+            
+            if self._dominates(solution.objectives, existing.objectives):
+                dominated_indices.append(i)
+        
+        # Eliminar soluciones dominadas por la nueva
+        for i in reversed(dominated_indices):
+            self.solutions.pop(i)
+        
+        # Agregar la nueva solución
+        self.solutions.append(solution)
+        
+        # Podar si excede el tamaño máximo
+        if len(self.solutions) > self.max_size:
+            self._truncate()
+        
+        return True
+    
+    def _dominates(
+        self,
+        objectives1: NDArray[np.float64],
+        objectives2: NDArray[np.float64]
+    ) -> bool:
+        """
+        Verifica si objectives1 domina a objectives2.
+        
+        Args:
+            objectives1: Valores objetivo de la primera solución.
+            objectives2: Valores objetivo de la segunda solución.
+        
+        Returns:
+            True si objectives1 domina a objectives2.
+        """
+        if self.maximize:
+            # Para maximización: objectives1 >= objectives2 en todo y > en algo
+            better_or_equal = np.all(objectives1 >= objectives2)
+            strictly_better = np.any(objectives1 > objectives2)
+        else:
+            # Para minimización: objectives1 <= objectives2 en todo y < en algo
+            better_or_equal = np.all(objectives1 <= objectives2)
+            strictly_better = np.any(objectives1 < objectives2)
+        
+        return better_or_equal and strictly_better
+    
+    def update_crowding_distances(self) -> None:
+        """
+        Calcula la distancia de apiñamiento para cada solución.
+        
+        La distancia de apiñamiento mide qué tan aislada está una solución
+        respecto a sus vecinos, favoreciendo la diversidad.
+        """
+        n = len(self.solutions)
+        if n == 0:
+            return
+        
+        n_objectives = len(self.solutions[0].objectives)
+        
+        # Reiniciar distancias
+        for sol in self.solutions:
+            sol.crowding_distance = 0.0
+        
+        for obj_idx in range(n_objectives):
+            # Ordenar por este objetivo
+            sorted_solutions = sorted(
+                self.solutions,
+                key=lambda s: s.objectives[obj_idx]
+            )
+            
+            # Asignar distancia infinita a los extremos
+            sorted_solutions[0].crowding_distance = float('inf')
+            sorted_solutions[-1].crowding_distance = float('inf')
+            
+            # Calcular rango del objetivo
+            obj_min = sorted_solutions[0].objectives[obj_idx]
+            obj_max = sorted_solutions[-1].objectives[obj_idx]
+            obj_range = obj_max - obj_min
+            
+            if obj_range == 0:
+                continue
+            
+            # Calcular distancia para soluciones intermedias
+            for i in range(1, n - 1):
+                distance = (
+                    sorted_solutions[i + 1].objectives[obj_idx] -
+                    sorted_solutions[i - 1].objectives[obj_idx]
+                ) / obj_range
+                sorted_solutions[i].crowding_distance += distance
+    
+    def _truncate(self) -> None:
+        """Reduce el tamaño del frente usando crowding distance."""
+        self.update_crowding_distances()
+        
+        # Ordenar por crowding distance (descendente)
+        self.solutions.sort(key=lambda s: s.crowding_distance, reverse=True)
+        
+        # Mantener las mejores (más diversas)
+        self.solutions = self.solutions[:self.max_size]
+    
+    def select_leader(self) -> Solution:
+        """
+        Selecciona un líder mediante torneo binario basado en crowding distance.
+        
+        Returns:
+            Solución seleccionada como líder.
+        """
+        if len(self.solutions) == 0:
+            raise ValueError("El frente de Pareto está vacío")
+        
+        if len(self.solutions) == 1:
+            return self.solutions[0]
+        
+        # Actualizar crowding distances
+        self.update_crowding_distances()
+        
+        # Torneo binario
+        idx1, idx2 = np.random.choice(len(self.solutions), 2, replace=False)
+        sol1, sol2 = self.solutions[idx1], self.solutions[idx2]
+        
+        # Seleccionar el más aislado (mayor crowding distance)
+        return sol1 if sol1.crowding_distance >= sol2.crowding_distance else sol2
+    
+    def get_decision_matrix(self) -> NDArray[np.float64]:
+        """
+        Retorna la matriz de decisión para métodos MCDM.
+        
+        Returns:
+            Matriz numpy de shape (n_soluciones, n_objetivos).
+        """
+        if not self.solutions:
+            return np.array([])
+        
+        return np.array([sol.objectives for sol in self.solutions])
+    
+    def get_parameters_matrix(self) -> NDArray[np.float64]:
+        """
+        Retorna la matriz de parámetros de todas las soluciones.
+        
+        Returns:
+            Matriz numpy de shape (n_soluciones, n_parámetros).
+        """
+        if not self.solutions:
+            return np.array([])
+        
+        return np.array([sol.parameters for sol in self.solutions])
+    
+    def to_list(self) -> List[Dict]:
+        """
+        Convierte el frente a lista de diccionarios.
+        
+        Returns:
+            Lista de diccionarios con 'position' y 'objectives'.
+        """
+        return [sol.to_dict() for sol in self.solutions]
+    
+    def get_best_by_objective(self, objective_index: int) -> Solution:
+        """
+        Obtiene la solución con mejor valor en un objetivo específico.
+        
+        Args:
+            objective_index: Índice del objetivo (0=Entropía, 1=SSIM, 2=VQI).
+        
+        Returns:
+            Solución con mejor valor en el objetivo especificado.
+        """
+        if not self.solutions:
+            raise ValueError("El frente de Pareto está vacío")
+        
+        if self.maximize:
+            return max(self.solutions, key=lambda s: s.objectives[objective_index])
+        else:
+            return min(self.solutions, key=lambda s: s.objectives[objective_index])
+    
+    def get_compromise_solution(self) -> Solution:
+        """
+        Obtiene la solución de compromiso (más cercana al punto ideal normalizado).
+        
+        Returns:
+            Solución más balanceada entre todos los objetivos.
+        """
+        if not self.solutions:
+            raise ValueError("El frente de Pareto está vacío")
+        
+        objectives_matrix = self.get_decision_matrix()
+        
+        # Normalizar objetivos
+        obj_min = objectives_matrix.min(axis=0)
+        obj_max = objectives_matrix.max(axis=0)
+        obj_range = obj_max - obj_min
+        obj_range[obj_range == 0] = 1  # Evitar división por cero
+        
+        normalized = (objectives_matrix - obj_min) / obj_range
+        
+        if self.maximize:
+            # Punto ideal es (1, 1, 1) para maximización
+            ideal_point = np.ones(normalized.shape[1])
+        else:
+            # Punto ideal es (0, 0, 0) para minimización
+            ideal_point = np.zeros(normalized.shape[1])
+        
+        # Calcular distancia euclidiana al punto ideal
+        distances = np.linalg.norm(normalized - ideal_point, axis=1)
+        
+        best_index = np.argmin(distances)
+        return self.solutions[best_index]
 
 
 def is_dominated(

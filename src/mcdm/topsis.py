@@ -7,7 +7,7 @@ y más lejana de la solución ideal negativa.
 
 import numpy as np
 from numpy.typing import NDArray
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class TOPSIS(MCDMMethod):

@@ -7,7 +7,7 @@ de borde (BAA) para cada criterio.
 
 import numpy as np
 from numpy.typing import NDArray
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class MABAC(MCDMMethod):

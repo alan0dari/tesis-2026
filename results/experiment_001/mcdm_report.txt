@@ -1,0 +1,112 @@
+================================================================================
+REPORTE DE DECISIÓN MULTICRITERIO (MCDM)
+================================================================================
+
+INFORMACIÓN DEL PROBLEMA
+----------------------------------------
+Número de alternativas: 61
+Número de criterios: 3
+Criterios: Entropía (H), SSIM, VQI
+Pesos: [0.40, 0.35, 0.25]
+Tipos: [beneficio, beneficio, beneficio]
+
+RESULTADOS POR MÉTODO MCDM
+----------------------------------------
+
+SMARTER:
+  Mejor alternativa: #26
+  Parámetros CLAHE: Rx=2, Ry=15, Clip=3.1917
+  Objetivos: H=7.5592, SSIM=0.7471, VQI=64.1407
+
+TOPSIS:
+  Mejor alternativa: #44
+  Parámetros CLAHE: Rx=2, Ry=6, Clip=2.0912
+  Objetivos: H=7.3352, SSIM=0.8418, VQI=56.7142
+
+Bellman-Zadeh:
+  Mejor alternativa: #44
+  Parámetros CLAHE: Rx=2, Ry=6, Clip=2.0912
+  Objetivos: H=7.3352, SSIM=0.8418, VQI=56.7142
+
+PROMETHEE II:
+  Mejor alternativa: #41
+  Parámetros CLAHE: Rx=2, Ry=26, Clip=4.0000
+  Objetivos: H=7.6644, SSIM=0.6865, VQI=66.0247
+
+GRA:
+  Mejor alternativa: #41
+  Parámetros CLAHE: Rx=2, Ry=26, Clip=4.0000
+  Objetivos: H=7.6644, SSIM=0.6865, VQI=66.0247
+
+VIKOR:
+  Mejor alternativa: #44
+  Parámetros CLAHE: Rx=2, Ry=6, Clip=2.0912
+  Objetivos: H=7.3352, SSIM=0.8418, VQI=56.7142
+
+CODAS:
+  Mejor alternativa: #41
+  Parámetros CLAHE: Rx=2, Ry=26, Clip=4.0000
+  Objetivos: H=7.6644, SSIM=0.6865, VQI=66.0247
+
+MABAC:
+  Mejor alternativa: #26
+  Parámetros CLAHE: Rx=2, Ry=15, Clip=3.1917
+  Objetivos: H=7.5592, SSIM=0.7471, VQI=64.1407
+
+================================================================================
+ANÁLISIS DE CONSENSO
+----------------------------------------
+
+Frecuencia de selección por alternativa:
+  Alternativa #44: 3/8 métodos (37.5%)
+    Params: Rx=2, Ry=6, Clip=2.0912
+    Objs: H=7.3352, SSIM=0.8418, VQI=56.7142
+  Alternativa #41: 3/8 métodos (37.5%)
+    Params: Rx=2, Ry=26, Clip=4.0000
+    Objs: H=7.6644, SSIM=0.6865, VQI=66.0247
+  Alternativa #26: 2/8 métodos (25.0%)
+    Params: Rx=2, Ry=15, Clip=3.1917
+    Objs: H=7.5592, SSIM=0.7471, VQI=64.1407
+
+----------------------------------------
+RANKING AGREGADO (Método de Borda)
+----------------------------------------
+
+Top 10 alternativas por puntuación Borda:
+  1. Alternativa #56 - Puntuación: 384
+     Params: Rx=2, Ry=11, Clip=2.6185
+  2. Alternativa #37 - Puntuación: 381
+     Params: Rx=2, Ry=13, Clip=2.7204
+  3. Alternativa #52 - Puntuación: 365
+     Params: Rx=2, Ry=17, Clip=2.7481
+  4. Alternativa #26 - Puntuación: 354
+     Params: Rx=2, Ry=15, Clip=3.1917
+  5. Alternativa #35 - Puntuación: 352
+     Params: Rx=2, Ry=20, Clip=3.3206
+  6. Alternativa #19 - Puntuación: 350
+     Params: Rx=2, Ry=23, Clip=2.5000
+  7. Alternativa #55 - Puntuación: 349
+     Params: Rx=2, Ry=17, Clip=2.2530
+  8. Alternativa #49 - Puntuación: 349
+     Params: Rx=2, Ry=23, Clip=2.3069
+  9. Alternativa #13 - Puntuación: 347
+     Params: Rx=2, Ry=22, Clip=3.1158
+  10. Alternativa #6 - Puntuación: 344
+     Params: Rx=2, Ry=26, Clip=2.6833
+
+================================================================================
+RECOMENDACIÓN FINAL
+================================================================================
+
+Por RANKING BORDA (sin consenso mayoritario):
+
+  ★ MEJOR ALTERNATIVA: #56
+  ═══════════════════════════════════
+  Parámetros CLAHE:
+    - Rx (filas región): 2
+    - Ry (cols región): 11
+    - Clip limit: 2.6185
+  Métricas de calidad:
+    - Entropía: 7.4725 bits
+    - SSIM: 0.7945
+    - VQI: 60.6415

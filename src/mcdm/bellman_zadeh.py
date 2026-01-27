@@ -7,7 +7,7 @@ la intersección de objetivos y restricciones difusas.
 
 import numpy as np
 from numpy.typing import NDArray
-from mcdm.base import MCDMMethod
+from src.mcdm.base import MCDMMethod
 
 
 class BellmanZadeh(MCDMMethod):
