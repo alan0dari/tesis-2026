@@ -279,7 +279,7 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
         
         # 5. Aplicar métodos MCDM
         decision_matrix = pareto_front.get_decision_matrix()
-        params_matrix = np.array([s.parameters for s in pareto_front.to_list()])
+        params_matrix = pareto_front.get_parameter_matrix()
         
         weights = np.array(config.get('weights', [0.40, 0.35, 0.25]))
         criteria_types = ['benefit', 'benefit', 'benefit']
