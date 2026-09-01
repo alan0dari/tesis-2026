@@ -66,6 +66,15 @@ results/*.csv
 results/*.pkl
 results/*.npz
 
+# Sitio de evaluacion: copias generadas por scripts/build_web_study.py
+# (los originales versionados estan en docs/evaluacion/estudio/img/)
+webapp/public/img/
+webapp/public/assets/concepto/
+
+# Lleva la URL y la clave del proyecto Supabase. El repo es publico: se versiona
+# la plantilla config.ejemplo.js y cada uno arma su config.js local.
+webapp/public/assets/config.js
+
 # Pytest
 .pytest_cache/
 .coverage

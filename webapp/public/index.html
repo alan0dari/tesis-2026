@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="es-PY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación de radiografías panorámicas — FP-UNA</title>
+<meta name="description" content="Estudio de percepción sobre procesamiento de radiografías panorámicas. Facultad Politécnica, Universidad Nacional de Asunción.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/marca/isotipo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Titillium+Web:wght@600;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+</head>
+<body class="pagina">
+
+<!-- Iconos y la ilustración del par, definidos una sola vez -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="ico-info" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.2"/><circle cx="12" cy="7.8" r=".9" fill="currentColor" stroke="none"/>
+    </g>
+    <g id="ico-reloj" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <circle cx="12" cy="12" r="8.6"/><path d="M12 7.2V12l3.2 2"/>
+    </g>
+    <g id="ico-check" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m5 12.6 4.6 4.4L19 7.4"/>
+    </g>
+    <g id="ico-cerrar" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>
+    </g>
+    <g id="ico-volver" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 5.4v5.4h5.4"/><path d="M4.6 10.2a8 8 0 1 1 1.4 6.6"/>
+    </g>
+    <g id="ico-mouse" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <rect x="7.4" y="3.2" width="9.2" height="17.6" rx="4.6"/><path d="M12 7v3.2"/>
+    </g>
+    <g id="ico-toque" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.6 11.4V6.2a1.8 1.8 0 0 1 3.6 0v6.6"/>
+      <path d="M13.2 10.6a1.7 1.7 0 0 1 3.4 0v1"/>
+      <path d="M16.6 11.4a1.7 1.7 0 0 1 3.4 0v3.2c0 3.4-2.4 6.2-5.8 6.2h-1.4c-2 0-3.3-.9-4.3-2.4l-2.4-3.7a1.8 1.8 0 0 1 2.8-2.2l1.1 1.2"/>
+    </g>
+    <g id="ico-trackpad" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M3 14.4h18"/>
+    </g>
+    <g id="ico-flecha" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h13M12.5 6l6 6-6 6"/>
+    </g>
+    <g id="ico-editar" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 20h4.2L19 9.2a2.1 2.1 0 0 0-3-3L5.2 17z"/><path d="M14.4 7.8l3 3"/>
+    </g>
+    <g id="ico-atras" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H6M11.5 6l-6 6 6 6"/>
+    </g>
+
+    <!-- Referencia visual del par: se usa en la portada y en el instructivo -->
+    <symbol id="demo-par" viewBox="0 0 620 296">
+      <rect x="4" y="4" width="296" height="182" rx="9" fill="#101722" stroke="#243044"/>
+      <g opacity=".6">
+        <path d="M38 128 Q152 58 266 128" fill="none" stroke="#b9c6d8" stroke-width="30" stroke-linecap="round"/>
+        <path d="M38 128 Q152 58 266 128" fill="none" stroke="#101722" stroke-width="30"
+              stroke-linecap="butt" stroke-dasharray="1.5 17"/>
+        <path d="M48 150 Q152 96 256 150" fill="none" stroke="#8f9fb6" stroke-width="17" stroke-linecap="round"/>
+        <path d="M48 150 Q152 96 256 150" fill="none" stroke="#101722" stroke-width="17"
+              stroke-linecap="butt" stroke-dasharray="1.5 13"/>
+      </g>
+      <rect x="16" y="15" width="26" height="19" rx="4" fill="#000" opacity=".55"/>
+      <text x="29" y="29" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="system-ui">1</text>
+
+      <rect x="320" y="4" width="296" height="182" rx="9" fill="#101722" stroke="#243044"/>
+      <g opacity=".95">
+        <path d="M354 128 Q468 58 582 128" fill="none" stroke="#e0e8f3" stroke-width="30" stroke-linecap="round"/>
+        <path d="M354 128 Q468 58 582 128" fill="none" stroke="#0d141d" stroke-width="30"
+              stroke-linecap="butt" stroke-dasharray="1.5 17"/>
+        <path d="M364 150 Q468 96 572 150" fill="none" stroke="#adbcd2" stroke-width="17" stroke-linecap="round"/>
+        <path d="M364 150 Q468 96 572 150" fill="none" stroke="#0d141d" stroke-width="17"
+              stroke-linecap="butt" stroke-dasharray="1.5 13"/>
+      </g>
+      <rect x="332" y="15" width="26" height="19" rx="4" fill="#000" opacity=".55"/>
+      <text x="345" y="29" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="system-ui">2</text>
+
+      <rect x="146" y="208" width="152" height="46" rx="9" fill="#fff" stroke="#d6deec"/>
+      <text x="222" y="237" text-anchor="middle" fill="#46536b" font-size="15" font-family="system-ui" font-weight="600">Imagen 1</text>
+      <rect x="322" y="208" width="152" height="46" rx="9" fill="#384f87"/>
+      <text x="398" y="237" text-anchor="middle" fill="#fff" font-size="15" font-family="system-ui" font-weight="600">Imagen 2</text>
+      <path d="M404 246 l0 22 5.5 -6 4 8.5 4.5 -2.5 -4 -8.5 8 -1.5z" fill="#1b2333" stroke="#fff" stroke-width="1.4"/>
+    </symbol>
+  </defs>
+</svg>
+
+<a class="saltar" href="#principal">Saltar al contenido</a>
+
+
+<!-- presentación -->
+<div id="vista-inicio">
+
+  <header class="barra">
+    <div class="sello">
+      <img src="assets/marca/isologo.png" width="211" height="315"
+           alt="Escudo de la Universidad Nacional de Asunción, Facultad Politécnica">
+      <div class="sello__texto">
+        <b>Universidad Nacional de Asunción</b>
+        Facultad Politécnica
+      </div>
+    </div>
+  </header>
+
+  <main id="principal">
+    <section class="portada envoltura">
+      <p class="encabezado">Estudio de percepción visual</p>
+      <h1>¿En cuál de las dos imágenes podrías dar un diagnóstico médico con más confianza?</h1>
+      <p class="bajada">
+        Estamos probando si el procesamiento automático de radiografías
+        panorámicas mejora algo que un profesional realmente perciba.
+      </p>
+      <ul class="datos-rapidos">
+        <li><svg width="17" height="17" viewBox="0 0 24 24"><use href="#ico-reloj"/></svg> 25 minutos</li>
+      </ul>
+    </section>
+
+    <!-- qué vas a ver -->
+    <section class="seccion envoltura">
+      <div class="rejilla rejilla--2">
+        <div>
+          <h2>Qué vas a ver</h2>
+          <p>
+            En cada pantalla aparecen <b>dos recortes de la misma región</b> de la
+            misma radiografía. Mismo paciente, misma zona y mismo
+            encuadre. Lo único que cambia entre las dos es cómo fue procesada la
+            imagen.
+          </p>
+        </div>
+        <div class="demo" aria-hidden="true">
+          <svg viewBox="0 0 620 296" role="img"><use href="#demo-par"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- registro -->
+    <section class="seccion envoltura estrecho" id="empezar">
+      <div class="registro">
+        <h2>Empezar la evaluación</h2>
+        <form id="form-inicio" novalidate>
+          <label class="campo" for="correo">Correo electrónico</label>
+          <input type="email" id="correo" name="correo" required autocomplete="email"
+                 inputmode="email" placeholder="nombre@ejemplo.com" spellcheck="false">
+
+          <div class="acciones">
+            <button type="submit" class="boton boton--principal" id="btn-empezar">
+              <span>Comenzar</span>
+            </button>
+            <a class="boton boton--fantasma" href="info.html" target="_blank" rel="noopener">
+              <svg width="18" height="18" viewBox="0 0 24 24"><use href="#ico-info"/></svg>
+              De qué trata el estudio
+            </a>
+          </div>
+          <p class="error" id="error-inicio" hidden></p>
+        </form>
+      </div>
+    </section>
+
+    <footer class="pie envoltura">
+      <p style="margin:0">
+        Facultad Politécnica, Universidad Nacional de Asunción ·
+        Consultas: <a href="mailto:alan0dari96@fpuna.edu.py">alan0dari96@fpuna.edu.py</a> / <a href="mailto:lulu08zarza@fpuna.edu.py">lulu08zarza@fpuna.edu.py</a>
+      </p>
+    </footer>
+  </main>
+</div>
+
+
+<!-- la tarea -->
+<div id="vista-tarea" class="visor" hidden>
+  <div class="visor__barra">
+    <div class="progreso"><span id="progreso-barra"></span></div>
+    <div class="visor__cuenta" id="visor-cuenta">0 / 0</div>
+    <button type="button" class="ayuda-boton" id="btn-ayuda" title="¿Cómo evaluar?">
+      <svg width="15" height="15" viewBox="0 0 24 24"><use href="#ico-info"/></svg>
+      <span>¿Cómo evaluar?</span>
+    </button>
+    <div class="estado-guardado" id="estado-guardado" data-estado="ok">
+      <svg width="14" height="14" viewBox="0 0 24 24"><use href="#ico-check"/></svg>
+      <span id="estado-texto">Guardado</span>
+    </div>
+  </div>
+
+  <div class="visor__cuerpo">
+    <div class="par">
+      <div class="marco" id="marco-a"><img id="img-a" alt="Opción 1"><span class="marco__letra">1</span></div>
+      <div class="marco" id="marco-b"><img id="img-b" alt="Opción 2"><span class="marco__letra">2</span></div>
+    </div>
+
+    <div class="herramientas">
+      <button type="button" id="zoom-menos" title="Alejar" aria-label="Alejar">−</button>
+      <button type="button" id="zoom-mas" title="Acercar" aria-label="Acercar">+</button>
+      <button type="button" id="zoom-reset" title="Restablecer la vista" aria-label="Restablecer la vista">⟲</button>
+      <span class="separador"></span>
+      <span>Acercá con la rueda del mouse o los botones · arrastrá para desplazarte en las dos imágenes al mismo tiempo</span>
+    </div>
+
+    <div class="pregunta" id="pregunta-eleccion">
+      <p>¿En cuál de las dos evaluarías esta región con más confianza?</p>
+      <div class="opciones">
+        <button type="button" class="opcion" data-eleccion="a">Imagen 1 <kbd>1</kbd></button>
+        <button type="button" class="opcion" data-eleccion="b">Imagen 2 <kbd>2</kbd></button>
+      </div>
+    </div>
+
+    <div class="pregunta" id="pregunta-confianza" hidden>
+      <p>Elegiste la <b id="confianza-elegida">Imagen 1</b>. ¿Qué tan seguro estás?</p>
+      <div class="opciones">
+        <button type="button" class="opcion" data-confianza="seguro">Seguro <kbd>1</kbd></button>
+        <button type="button" class="opcion" data-confianza="algo">Algo seguro <kbd>2</kbd></button>
+        <button type="button" class="opcion opcion--suave" data-confianza="adivinando">Se ven iguales <kbd>3</kbd></button>
+      </div>
+      <button type="button" class="volver" id="btn-volver-eleccion">
+        <svg width="16" height="16" viewBox="0 0 24 24"><use href="#ico-atras"/></svg>
+        Volver atrás y cambiar la elección
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- gracias -->
+<div id="vista-gracias" class="gracias" hidden>
+  <div class="gracias__caja">
+    <h1>Gracias! Tu tiempo nos ayuda mucho :)</h1>
+
+    <div class="gracias__campo" id="bloque-comentario">
+      <label class="campo" for="comentario">
+        ¿Qué tuviste en cuenta para las elecciones que hiciste?
+      </label>
+      <textarea id="comentario"></textarea>
+      <div class="acciones acciones--centro">
+        <button type="button" class="boton boton--principal" id="btn-comentario">Enviar</button>
+        <button type="button" class="boton boton--fantasma" id="btn-cancelar-comentario" hidden>Cancelar</button>
+      </div>
+      <p class="pista" id="comentario-estado" hidden></p>
+    </div>
+
+    <div id="comentario-listo" hidden>
+      <div class="confirmacion">
+        <svg width="20" height="20" viewBox="0 0 24 24"><use href="#ico-check"/></svg>
+        Gracias por tu comentario!
+      </div>
+      <div class="acciones acciones--centro">
+        <button type="button" class="boton boton--fantasma" id="btn-editar-comentario">
+          <svg width="17" height="17" viewBox="0 0 24 24"><use href="#ico-editar"/></svg>
+          Editar comentario
+        </button>
+      </div>
+    </div>
+
+    <div class="gracias__cierre">
+      <p>
+        Si te quedaste con la curiosidad
+      </p>
+      <a class="boton boton--fantasma" href="info.html" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24"><use href="#ico-info"/></svg>
+        De qué trata el estudio
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- modales -->
+
+<!-- Cómo se responde: se abre sola al empezar y queda a mano durante toda la
+     evaluación, desde el botón de la barra superior. -->
+<div id="modal-instrucciones" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="instrucciones-titulo">
+  <div class="modal__caja modal__caja--ancho">
+    <button type="button" class="modal__cerrar" id="btn-cerrar-instrucciones" aria-label="Cerrar">
+      <svg width="18" height="18" viewBox="0 0 24 24"><use href="#ico-cerrar"/></svg>
+    </button>
+
+    <h2 id="instrucciones-titulo">Cómo se responde</h2>
+
+    <div class="demo" aria-hidden="true" style="margin:18px 0 24px">
+      <svg viewBox="0 0 620 296" role="img"><use href="#demo-par"/></svg>
+    </div>
+
+    <ol class="pasos">
+      <li>
+        <b>Elegís una de las dos.</b>
+        Hacé clic en <i>Imagen 1</i> o <i>Imagen 2</i>, o usá las teclas
+        <kbd>1</kbd> y <kbd>2</kbd>
+      </li>
+      <li>
+        <b>Decís qué tan seguro estás.</b>
+        <i>Seguro</i>, <i>Algo seguro</i> o <i>Se ven iguales</i>.
+      </li>
+    </ol>
+
+    <div class="modal__bloque">
+      <h3>Controles:</h3>
+      <ul class="controles">
+        <li>
+          <svg width="20" height="20" viewBox="0 0 24 24"><use href="#ico-mouse"/></svg>
+          <span><b>Con mouse:</b> rueda para +- zoom, mantener y arrastrar el
+          clic izquierdo para desplazar las imágenes.</span>
+        </li>
+        <li>
+          <svg width="20" height="20" viewBox="0 0 24 24"><use href="#ico-toque"/></svg>
+          <span><b>En el celular:</b> pellizcar con dos dedos para +- zoom, mantener y
+          mover con uno desplazar las imágenes.</span>
+        </li>
+        <li>
+          <svg width="20" height="20" viewBox="0 0 24 24"><use href="#ico-volver"/></svg>
+          <span><b>Por defecto:</b> los botones
+          <b>+</b>, <b>−</b> y <b>⟲</b> debajo de las imágenes hacen lo mismo.
+          <b>⟲</b> restablece a la vista original.</span>
+        </li>
+      </ul>
+      <p class="pista" style="margin-top:14px">
+        Las dos imágenes se desplazan juntas
+      </p>
+    </div>
+
+    <div class="modal__acciones">
+      <button type="button" class="boton boton--principal" id="btn-entendido">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-reanudar" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="reanudar-titulo">
+  <div class="modal__caja">
+    <div class="modal__icono"><svg width="24" height="24" viewBox="0 0 24 24"><use href="#ico-volver"/></svg></div>
+    <h2 id="reanudar-titulo">Bienvenido de vuelta</h2>
+    <p id="reanudar-texto">
+      Seguí desde donde te quedaste.
+    </p>
+    <div class="modal__progreso">
+      <span id="reanudar-detalle"></span>
+      <div class="barrita"><span id="reanudar-barra"></span></div>
+    </div>
+    <div class="modal__acciones">
+      <button type="button" class="boton boton--principal" id="btn-retomar">Reanudar</button>
+      <button type="button" class="boton boton--fantasma" id="btn-otro-correo">Usar otro correo</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-aviso" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="aviso-titulo">
+  <div class="modal__caja">
+    <div class="modal__icono"><svg width="24" height="24" viewBox="0 0 24 24"><use href="#ico-info"/></svg></div>
+    <h2 id="aviso-titulo">Aviso</h2>
+    <p id="aviso-texto"></p>
+    <div class="modal__acciones">
+      <button type="button" class="boton boton--principal" id="btn-aviso-ok">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<div class="brindis" id="brindis" role="status" aria-live="polite"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
