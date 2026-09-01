@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es-PY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sobre el estudio — Evaluación de radiografías panorámicas | FP-UNA</title>
+<meta name="description" content="Quiénes somos y qué estamos midiendo. Tesis de grado, Facultad Politécnica – UNA.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/marca/isotipo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Titillium+Web:wght@600;700&display=swap">
+<link rel="stylesheet" href="assets/estilo.css">
+</head>
+<body class="pagina">
+
+<header class="barra">
+  <div class="sello">
+    <img src="assets/marca/isologo.png" width="211" height="315"
+         alt="Escudo de la Universidad Nacional de Asunción, Facultad Politécnica">
+    <div class="sello__texto">
+      <b>Universidad Nacional de Asunción</b>
+      Facultad Politécnica
+    </div>
+  </div>
+</header>
+
+<main class="envoltura">
+
+  <section class="info-cabecera">
+    <p class="encabezado">Sobre el estudio</p>
+    <h1>Qué estamos midiendo</h1>
+  </section>
+
+  <!-- quiénes -->
+  <section class="info-seccion" id="quienes">
+    <h2>Quiénes somos</h2>
+    <p>
+      Somos dos estudiantes de Ingeniería en Informática de la <b>FP-UNA</b>, terminando la tesis de grado. se hace bajo la orientación de docentes
+      investigadores de la facultad.
+    </p>
+    <div class="personas">
+      <div class="persona">
+        <div class="persona__inicial">L</div>
+        <div>
+          <b>Luhana A. González Zarza</b>
+          <span>Tesista · FP-UNA</span>
+        </div>
+      </div>
+      <div class="persona">
+        <div class="persona__inicial">A</div>
+        <div>
+          <b>Alan M. Ruiz Díaz Nodari</b>
+          <span>Tesista · FP-UNA</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:22px">
+      Es un trabajo académico, hecho dentro de la facultad bajo la orientación de docentes
+      investigadores de la facultad (nuestros tutores), y sus resultados van a
+      quedar publicados en la tesis.
+    </p>
+    <div class="nota" style="margin-top:22px">
+      <p style="margin:0">
+        <b>Para qué necesitamos la evaluación.</b> Nuestro sistema decide, cuál
+        de muchas versiones procesadas de una radiografía es “la mejor”. Esa
+        decisión hoy la toman tres fórmulas matemáticas. Lo que ninguna fórmula
+        sabe es si un profesional que lee radiografías todos los días
+        <b>realmente ve una diferencia</b>, y de qué lado está.
+      </p>
+    </div>
+  </section>
+
+  <!-- problema -->
+  <section class="info-seccion" id="problema">
+    <h2>El problema: no todas las panorámicas salen igual</h2>
+    <p>
+      A veces la placa sale <b>demasiado oscura</b> y las raíces se hunden en el
+      fondo negro (negro sobre negro). A veces sale <b>demasiado clara</b> y el esmalte se funde con el
+      hueso (blanco sobre blanco). Y a veces los grises quedan
+      <b>apretados en el medio</b>, sin negros ni blancos.
+    </p>
+    <p>
+      Lo que se pierde son los <b>bordes</b>:
+      la línea que delimitan el inicio y fin de una estructura. La forma
+      clásica de recuperar es procesar la imagen para repartir mejor los grises; a esa técnica está definida como
+      <b>Ecualización de Histograma</b> y el método más usado para eso se llama <b>CLAHE</b>.
+    </p>
+    <p>
+      En nuestro experimento partimos de radiografías reales y les aplicamos a
+      propósito cinco tipos de problemas (ruido visual) con deterioro controlado. Así se ven:
+    </p>
+    <figure>
+      <img src="assets/concepto/degradaciones.jpg" alt="Una misma radiografía panorámica mostrada seis veces: la original y cinco deterioros simulados, cada una con su histograma." loading="lazy">
+      <figcaption>
+        La misma panorámica, deteriorada de cinco maneras distintas. El recuadro
+        de cada una es su histograma: cómo se distribuyen los tonos/niveles de gris entre el
+        negro y el blanco.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- framework -->
+  <section class="info-seccion" id="framework">
+    <h2>Qué hace el sistema</h2>
+    <p>
+      CLAHE tiene dos perillas: <b>cuánto contraste agregar</b> y <b>en regiones
+      de qué tamaño</b>. No existe un valor correcto universal: lo que le viene
+      bien a una radiografía arruina a otra. Entonces, en vez de fijar un
+      valor, el sistema prueba miles de combinaciones de forma automática y
+      mide cada resultado con tres reglas distintas.
+    </p>
+
+    <ol class="pasos-exp">
+
+      <!-- 01 -->
+      <li class="paso-exp">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#0f1621"/>
+          <path d="M22 62 Q80 24 138 62" fill="none" stroke="#e2eaf5" stroke-width="16" stroke-linecap="round"/>
+          <path d="M22 62 Q80 24 138 62" fill="none" stroke="#0f1621" stroke-width="16" stroke-dasharray="1.2 8.5"/>
+          <path d="M28 76 Q80 44 132 76" fill="none" stroke="#b3c1d6" stroke-width="10" stroke-linecap="round"/>
+          <path d="M28 76 Q80 44 132 76" fill="none" stroke="#0f1621" stroke-width="10" stroke-dasharray="1.2 6.5"/>
+        </svg>
+        <div>
+          <span class="paso-exp__num">01</span>
+          <b>Una radiografía real</b>
+          <p>Ortopantomografías de un dataset proveído</p>
+        </div>
+      </li>
+
+      <!-- 02 -->
+      <li class="paso-exp">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#141c27"/>
+          <path d="M22 62 Q80 24 138 62" fill="none" stroke="#69768a" stroke-width="16" stroke-linecap="round"/>
+          <path d="M22 62 Q80 24 138 62" fill="none" stroke="#2b3644" stroke-width="16" stroke-dasharray="1.2 8.5"/>
+          <path d="M28 76 Q80 44 132 76" fill="none" stroke="#5c6879" stroke-width="10" stroke-linecap="round"/>
+          <path d="M28 76 Q80 44 132 76" fill="none" stroke="#2b3644" stroke-width="10" stroke-dasharray="1.2 6.5"/>
+        </svg>
+        <div>
+          <span class="paso-exp__num">02</span>
+          <b>Se la deteriora a propósito</b>
+          <p>Cinco tipos de problema controlado</p>
+        </div>
+      </li>
+
+      <!-- 03 -->
+      <li class="paso-exp">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#0f1621"/>
+          <rect x="14" y="9" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M21 26 Q34 16 47 26" fill="none" stroke="#5f6e85" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="60" y="9" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M67 26 Q80 16 93 26" fill="none" stroke="#8b99ae" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="106" y="9" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M113 26 Q126 16 139 26" fill="none" stroke="#c3cede" stroke-width="4.5" stroke-linecap="round"/>
+
+          <rect x="14" y="38" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M21 55 Q34 45 47 55" fill="none" stroke="#e6edf7" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="60" y="38" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M67 55 Q80 45 93 55" fill="none" stroke="#96a4ba" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="106" y="38" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M113 55 Q126 45 139 55" fill="none" stroke="#a4b2c7" stroke-width="4.5" stroke-linecap="round"/>
+
+          <rect x="14" y="67" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M21 84 Q34 74 47 84" fill="none" stroke="#cfdaea" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="60" y="67" width="40" height="24" rx="4" fill="#18202c"/>
+          <path d="M67 84 Q80 74 93 84" fill="none" stroke="#6b7a91" stroke-width="4.5" stroke-linecap="round"/>
+          <rect x="106" y="67" width="40" height="24" rx="4" fill="#18202c"/>
+          <text x="126" y="84" text-anchor="middle" fill="#8593a9" font-size="15" font-family="system-ui">…</text>
+        </svg>
+        <div>
+          <span class="paso-exp__num">03</span>
+          <b>Se prueban miles de ajustes</b>
+          <p>El sistema recorre las combinaciones de CLAHE automáticamente</p>
+        </div>
+      </li>
+
+      <!-- 04 -->
+      <li class="paso-exp">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#0f1621"/>
+          <text x="44" y="27" text-anchor="end" fill="#93a1ba" font-size="10" font-family="system-ui">H</text>
+          <rect x="50" y="19" width="96" height="9" rx="4.5" fill="#232d3d"/>
+          <rect x="50" y="19" width="68" height="9" rx="4.5" fill="#9db6e8"/>
+          <text x="44" y="55" text-anchor="end" fill="#93a1ba" font-size="10" font-family="system-ui">SSIM</text>
+          <rect x="50" y="47" width="96" height="9" rx="4.5" fill="#232d3d"/>
+          <rect x="50" y="47" width="42" height="9" rx="4.5" fill="#6f8ac4"/>
+          <text x="44" y="83" text-anchor="end" fill="#93a1ba" font-size="10" font-family="system-ui">VIF</text>
+          <rect x="50" y="75" width="96" height="9" rx="4.5" fill="#232d3d"/>
+          <rect x="50" y="75" width="86" height="9" rx="4.5" fill="#c3d3f0"/>
+        </svg>
+        <div>
+          <span class="paso-exp__num">04</span>
+          <b>Se mide cada resultado</b>
+          <p>Tres métricas distintas puntúan cada versión: detalle, fidelidad e información visual</p>
+        </div>
+      </li>
+
+      <!-- 05 -->
+      <li class="paso-exp">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#0f1621"/>
+          <g fill="#6f8ac4">
+            <circle cx="20" cy="22" r="3.6"/><circle cx="20" cy="40" r="3.6"/>
+            <circle cx="20" cy="58" r="3.6"/><circle cx="20" cy="76" r="3.6"/>
+            <circle cx="36" cy="22" r="3.6"/><circle cx="36" cy="40" r="3.6"/>
+            <circle cx="36" cy="58" r="3.6"/><circle cx="36" cy="76" r="3.6"/>
+          </g>
+          <g stroke="#3a4761" stroke-width="1.6" fill="none">
+            <path d="M46 24 L76 47"/><path d="M46 49 L76 49"/><path d="M46 74 L76 51"/>
+          </g>
+          <rect x="84" y="28" width="62" height="44" rx="6" fill="#101722" stroke="#6f8ac4" stroke-width="1.6"/>
+          <path d="M92 60 Q115 42 138 60" fill="none" stroke="#dde6f2" stroke-width="7" stroke-linecap="round"/>
+          <path d="M92 60 Q115 42 138 60" fill="none" stroke="#101722" stroke-width="7" stroke-dasharray="1 5"/>
+          <circle cx="146" cy="29" r="9" fill="#6f8ac4"/>
+          <path d="m142 29 3 3 5.5 -5.5" fill="none" stroke="#0f1621" stroke-width="1.9"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <span class="paso-exp__num">05</span>
+          <b>Ocho métodos eligen una</b>
+          <p>Métodos de decisión multi-criterio (MCDM) resuelven el empate
+          </p>
+        </div>
+      </li>
+
+      <!-- 06 -->
+      <li class="paso-exp paso-exp--fin">
+        <svg class="paso-exp__figura" viewBox="0 0 160 100" aria-hidden="true">
+          <rect width="160" height="100" rx="8" fill="#0f1621"/>
+          <rect x="12" y="22" width="64" height="54" rx="6" fill="#101722" stroke="#243044"/>
+          <path d="M20 58 Q44 40 68 58" fill="none" stroke="#aab9cf" stroke-width="8" stroke-linecap="round"/>
+          <path d="M20 58 Q44 40 68 58" fill="none" stroke="#101722" stroke-width="8" stroke-dasharray="1 5"/>
+          <rect x="17" y="27" width="15" height="12" rx="3" fill="#000" opacity=".5"/>
+          <text x="24.5" y="36.5" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="system-ui">1</text>
+
+          <rect x="84" y="22" width="64" height="54" rx="6" fill="#101722" stroke="#6f8ac4" stroke-width="1.6"/>
+          <path d="M92 58 Q116 40 140 58" fill="none" stroke="#e6edf7" stroke-width="8" stroke-linecap="round"/>
+          <path d="M92 58 Q116 40 140 58" fill="none" stroke="#101722" stroke-width="8" stroke-dasharray="1 5"/>
+          <rect x="89" y="27" width="15" height="12" rx="3" fill="#000" opacity=".5"/>
+          <text x="96.5" y="36.5" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="system-ui">2</text>
+
+          <path d="M116 62 l0 20 5 -5.5 3.6 7.6 4.2 -2.2 -3.6 -7.6 7.3 -1.3z"
+                fill="#fff" stroke="#0f1621" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <span class="paso-exp__num">06</span>
+          <b>Juicio</b>
+          <p>Dos versiones y se elige una → ¿Coincidirá con los MCDM?</p>
+        </div>
+      </li>
+
+    </ol>
+
+    <p style="margin-top:22px">Las tres reglas que se miden en el paso 04 son:</p>
+    <ul>
+      <li><b>Cuánto detalle aparece</b> (entropía/H): si la imagen quedó más rica en información.</li>
+      <li><b>Cuánta fidelidad se conserva</b> (SSIM): si la estructura sigue siendo cercana a la radiografía original.</li>
+      <li><b>Cuánta información visual útil queda</b> (VIF): si el ojo humano percibe el procesamiento.</li>
+    </ul>
+  </section>
+
+  <!-- pareto -->
+  <section class="info-seccion" id="pareto">
+    <h2>Métricas en conflicto</h2>
+    <p>
+      Subir mucho el contraste hace aparecer detalle,
+      pero aleja la imagen de la original (la distorsiona). Conservar la fidelidad,
+      deja el detalle escondido. <b>Ningún ajuste es el mejor en las tres
+      medidas a la vez.</b>
+    </p>
+    <p>
+      Lo que queda es un conjunto de ajustes en los que no se puede mejorar una
+      cosa sin empeorar otra. Eso se llama <b>Frente de Pareto</b>, y es el
+      conjunto azul del gráfico:
+    </p>
+
+    <div class="diagrama">
+      <svg viewBox="0 0 620 330" role="img" aria-label="Gráfico de dispersión: los ajustes descartados quedan abajo a la izquierda, y los ajustes del frente de Pareto forman una curva donde ganar detalle cuesta fidelidad.">
+        <defs>
+          <style>
+            .eje  { stroke:#c9d3e5; stroke-width:1.4; }
+            .rot  { fill:#7b8699; font:400 12px Lato, system-ui; }
+            .dom  { fill:#c6cfdf; }
+            .fre  { fill:#384f87; }
+            .anot { fill:#46536b; font:400 12.5px Lato, system-ui; }
+          </style>
+        </defs>
+
+        <line class="eje" x1="70" y1="272" x2="590" y2="272"/>
+        <line class="eje" x1="70" y1="272" x2="70" y2="26"/>
+        <text class="rot" x="330" y="300" text-anchor="middle">más detalle visible  →</text>
+        <text class="rot" x="-150" y="20" transform="rotate(-90)" text-anchor="middle">más fidelidad  →</text>
+
+        <!-- ajustes dominados: siempre hay otro que los supera en todo -->
+        <g class="dom">
+          <circle cx="140" cy="214" r="5"/><circle cx="168" cy="238" r="5"/><circle cx="196" cy="200" r="5"/>
+          <circle cx="212" cy="248" r="5"/><circle cx="238" cy="222" r="5"/><circle cx="252" cy="256" r="5"/>
+          <circle cx="276" cy="204" r="5"/><circle cx="290" cy="240" r="5"/><circle cx="312" cy="226" r="5"/>
+          <circle cx="330" cy="258" r="5"/><circle cx="350" cy="212" r="5"/><circle cx="366" cy="244" r="5"/>
+          <circle cx="392" cy="230" r="5"/><circle cx="410" cy="260" r="5"/><circle cx="428" cy="244" r="5"/>
+          <circle cx="452" cy="256" r="5"/><circle cx="470" cy="236" r="5"/><circle cx="496" cy="258" r="5"/>
+          <circle cx="120" cy="242" r="5"/><circle cx="152" cy="262" r="5"/><circle cx="186" cy="264" r="5"/>
+          <circle cx="228" cy="188" r="5"/><circle cx="260" cy="176" r="5"/><circle cx="300" cy="184" r="5"/>
+          <circle cx="342" cy="192" r="5"/><circle cx="380" cy="204" r="5"/><circle cx="420" cy="214" r="5"/>
+        </g>
+
+        <!-- frente de Pareto -->
+        <path d="M106 66 C 190 86, 268 116, 336 152 S 462 208, 534 236"
+              fill="none" stroke="#384f87" stroke-width="2" stroke-dasharray="5 5" opacity=".45"/>
+        <g class="fre">
+          <circle cx="106" cy="66" r="6.5"/><circle cx="156" cy="82" r="6.5"/><circle cx="206" cy="102" r="6.5"/>
+          <circle cx="262" cy="126" r="6.5"/><circle cx="336" cy="152" r="6.5"/><circle cx="404" cy="182" r="6.5"/>
+          <circle cx="470" cy="210" r="6.5"/><circle cx="534" cy="236" r="6.5"/>
+        </g>
+
+        <text class="anot" x="300" y="-25" transform="rotate(25)"> Frente de Pareto</text>
+      </svg>
+    </div>
+
+    <p style="margin-top:22px">
+      Elegir un punto del Frente ya no es un problema matemático: es un
+      problema de <b>preferencias</b>. Por eso el sistema aplica ocho métodos de
+      decisión multicriterio, que son formas distintas y establecidas de resolver
+      exactamente ese tipo de empate.
+    </p>
+    <p>
+      El hallazgo: <b>los ocho métodos casi
+      siempre eligen la misma imagen, o imágenes que un algoritmo no logra
+      distinguir entre sí</b>. Lo que no sabemos es si esa indistinguibilidad
+      también es cierta para el ojo humano entrenado.
+    </p>
+  </section>
+
+  <!-- vos -->
+  <section class="info-seccion" id="vos">
+    <h2>La evaluación en sí</h2>
+    <p>
+      En la evaluación ves <b>pares de recortes</b> de una misma región de una
+      misma radiografía. Lo único que cambia entre los dos es cómo se procesó.
+    </p>
+    <figure>
+      <img src="assets/concepto/sextantes.jpg" alt="Una panorámica dividida en seis sextantes, con uno resaltado, y debajo ese sextante ampliado tal como aparece en la evaluación." loading="lazy">
+      <figcaption>
+        A cada radiografía le toca un sextante, sorteado de forma balanceada
+        entre los seis. El recorte es idéntico en las dos imágenes del par, así
+        la comparación es exacta.
+      </figcaption>
+    </figure>
+
+    <h3 style="margin-top:32px">Qué hacemos con las respuestas</h3>
+    <p>
+      Analizamos los juicios de todos los participantes y miramos tres cosas: si la
+      versión procesada le gana a la original, cuál de las tres medidas predice
+      mejor lo que prefiere un profesional, y a partir de qué diferencia dos
+      imágenes dejan de ser distinguibles para una persona. Con eso podemos
+      <b>confirmar o corregir con datos</b> el orden de importancia que hoy le
+      damos a las tres medidas.
+    </p>
+  </section>
+
+  <!-- datos -->
+  <section class="info-seccion" id="datos">
+    <h2>¿Qué datos guardamos de los participantes?</h2>
+    <ul>
+      <li><b>El único dato que guardamos es el correo.</b></li>
+      <li><b>Para qué se usa:</b> para asignar un set único de imágenes a cada participante.</li>
+    </ul>
+    <p style="margin-top:26px">
+      Cualquier duda, con gusto:
+      <a href="mailto:alan0dari96@fpuna.edu.py">alan0dari96@fpuna.edu.py</a> /
+      <a href="mailto:lulu08zarza@fpuna.edu.py">lulu08zarza@fpuna.edu.py</a>
+    </p>
+    <p>
+      <a class="boton boton--principal" href="index.html" style="margin-top:8px">
+        Ir a la evaluación
+      </a>
+    </p>
+  </section>
+
+  <footer class="pie">
+    <p style="margin:0">
+      Facultad Politécnica, Universidad Nacional de Asunción ·
+      Consultas: <a href="mailto:alan0dari96@fpuna.edu.py">alan0dari96@fpuna.edu.py</a> / <a href="mailto:lulu08zarza@fpuna.edu.py">lulu08zarza@fpuna.edu.py</a>
+    </p>
+  </footer>
+</main>
+</body>
+</html>

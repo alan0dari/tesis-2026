@@ -1,0 +1,29 @@
+# Latido para que el proyecto gratuito de Supabase no se pause por inactividad.
+#
+# Para activarlo: copiar este archivo a .github/workflows/mantener-despierto.yml
+# y cargar en GitHub (Settings -> Secrets and variables -> Actions) los secretos
+# SUPABASE_URL y SUPABASE_ANON_KEY.
+#
+# Se puede borrar cuando termine la recolección de datos.
+
+name: mantener despierto
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *'      # cada tres días, mediodía UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar a ping()
+        run: |
+          curl -sS -f -X POST "$SUPABASE_URL/rest/v1/rpc/ping" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
