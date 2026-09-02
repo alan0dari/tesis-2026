@@ -1,0 +1,233 @@
+\chapter{Optimización multiobjetivo y métodos de decisión multicriterio} % Título del capítulo
+\label{Chapter3}
+\lhead{Capítulo 3. \emph{Optimización multiobjetivo y MCDM}}
+
+Este capítulo presenta los fundamentos de las dos técnicas centrales del framework: la optimización multiobjetivo mediante el algoritmo SMPSO, que genera el conjunto de soluciones candidatas, y los métodos de decisión multicriterio (MCDM), que seleccionan la solución final de entre las candidatas.
+
+\section{Optimización multiobjetivo}
+
+\subsection{Formulación del problema}
+
+Un problema de optimización multiobjetivo (MOP, \textit{Multi-objective Optimization Problem}) consiste en encontrar un vector de variables de decisión $\vec{x} = (x_1, \ldots, x_n)$ dentro de una región factible $\Omega$ que optimice simultáneamente un vector de $k$ funciones objetivo:
+
+\begin{equation}
+\text{maximizar} \quad \vec{f}(\vec{x}) = \left( f_1(\vec{x}), f_2(\vec{x}), \ldots, f_k(\vec{x}) \right), \quad \vec{x} \in \Omega
+\label{eq:mop}
+\end{equation}
+
+Cuando los objetivos están en conflicto, no existe una solución única que optimice todos a la vez; la mejora de un objetivo implica el deterioro de otro. La noción de optimalidad se formaliza entonces mediante la dominancia de Pareto.
+
+\subsection{Dominancia y Frente de Pareto}
+
+Dadas dos soluciones $\vec{u}, \vec{v} \in \Omega$ en un problema de maximización, se dice que $\vec{u}$ \textbf{domina} a $\vec{v}$ (denotado $\vec{u} \succ \vec{v}$) si y solo si:
+
+\begin{equation}
+\forall i \in \{1, \ldots, k\}: f_i(\vec{u}) \geq f_i(\vec{v}) \quad \land \quad \exists j \in \{1, \ldots, k\}: f_j(\vec{u}) > f_j(\vec{v})
+\label{eq:dominancia}
+\end{equation}
+
+es decir, $\vec{u}$ es al menos tan buena como $\vec{v}$ en todos los objetivos y estrictamente mejor en al menos uno. Una solución $\vec{x}^*$ es \textbf{Pareto-óptima} si no existe ninguna otra solución factible que la domine. El conjunto de todas las soluciones Pareto-óptimas se denomina \textbf{conjunto de Pareto}, y su imagen en el espacio de objetivos, \textbf{Frente de Pareto}.
+
+El resultado de un algoritmo de optimización multiobjetivo es una aproximación del Frente de Pareto: un conjunto de soluciones no dominadas entre sí que representan distintos compromisos entre los objetivos. La calidad de esta aproximación se evalúa según dos propiedades: \textit{convergencia} (cercanía al frente verdadero) y \textit{diversidad} (cobertura uniforme del frente).
+
+\subsection{Optimización por enjambre de partículas (PSO)}
+
+PSO (\textit{Particle Swarm Optimization}) \citep{Kennedy1995} es una metaheurística poblacional inspirada en el comportamiento colectivo de bandadas y cardúmenes. Cada individuo (\textit{partícula}) representa una solución candidata y se desplaza por el espacio de búsqueda guiado por su propia experiencia y la del enjambre. En cada iteración $t$, la velocidad y posición de la partícula $i$ se actualizan como:
+
+\begin{align}
+\vec{v}_i(t+1) &= w \cdot \vec{v}_i(t) + C_1 r_1 \left( \vec{x}_{p_i} - \vec{x}_i(t) \right) + C_2 r_2 \left( \vec{x}_{g} - \vec{x}_i(t) \right) \label{eq:pso_velocidad}\\
+\vec{x}_i(t+1) &= \vec{x}_i(t) + \vec{v}_i(t+1) \label{eq:pso_posicion}
+\end{align}
+
+donde $w$ es el peso de inercia, $C_1$ y $C_2$ los coeficientes cognitivo y social, $r_1, r_2 \sim U(0,1)$, $\vec{x}_{p_i}$ la mejor posición personal de la partícula y $\vec{x}_g$ la mejor posición global (o local) conocida.
+
+La extensión de PSO a problemas multiobjetivo requiere resolver dos cuestiones: cómo seleccionar los líderes ($\vec{x}_g$) cuando no existe un único ``mejor'' global, y cómo almacenar las soluciones no dominadas encontradas. La solución habitual es mantener un \textbf{archivo externo} de soluciones no dominadas del cual se seleccionan los líderes.
+
+\subsection{SMPSO}
+\label{sec:smpso}
+
+SMPSO (\textit{Speed-constrained Multi-objective PSO}) \citep{Nebro2009} es un algoritmo de optimización multiobjetivo basado en PSO que introduce un mecanismo de restricción de velocidad para evitar la ``explosión'' de velocidades que degrada la búsqueda en variantes previas como OMOPSO. Sus componentes distintivos son:
+
+\textbf{Coeficiente de constricción.} La velocidad calculada en la Ecuación~\ref{eq:pso_velocidad} se multiplica por el coeficiente de constricción $\chi$ de Clerc y Kennedy \citep{Clerc2002}:
+
+\begin{equation}
+\chi = \begin{cases} \dfrac{2}{2 - \rho - \sqrt{\rho^2 - 4\rho}} & \text{si } \rho > 4 \\[3mm] 1 & \text{si } \rho \leq 4 \end{cases},
+\qquad \rho = C_1 + C_2
+\label{eq:constriccion}
+\end{equation}
+
+Los coeficientes se muestrean en cada actualización como $C_1, C_2 \sim U(1.5, 2.5)$ ---de modo que $\rho \in [3, 5]$ y el régimen de constricción se activa de forma intermitente--- y el peso de inercia se fija en $w = 0.1$.\footnote{Obsérvese que para $\rho > 4$ la expresión de $\chi$ resulta negativa: además de atenuar la magnitud de la velocidad, invierte su dirección. Así está definida en \citet{Nebro2009} y así la implementa jMetal, la biblioteca de referencia de los autores del algoritmo; este trabajo conserva esa definición por fidelidad al método.}
+
+\textbf{Restricción de velocidad.} Adicionalmente, la velocidad de cada variable $j$ se acota según los límites del espacio de búsqueda:
+
+\begin{equation}
+\delta_j = \frac{upper_j - lower_j}{2}, \qquad
+v_{i,j}(t) = \begin{cases} \delta_j & \text{si } v_{i,j}(t) > \delta_j \\ -\delta_j & \text{si } v_{i,j}(t) < -\delta_j \\ v_{i,j}(t) & \text{en otro caso} \end{cases}
+\label{eq:delta}
+\end{equation}
+
+Cuando una partícula excede un límite del espacio de búsqueda, su posición se fija en el límite y su velocidad se invierte (rebote).
+
+\textbf{Archivo externo y selección de líderes.} Las soluciones no dominadas se almacenan en un archivo externo de tamaño acotado. Cuando el archivo excede su capacidad, se eliminan las soluciones ubicadas en las regiones más densas según la \textit{distancia de apiñamiento} (\textit{crowding distance}) \citep{Deb2002}, preservando la diversidad del frente. Los líderes se seleccionan del archivo mediante torneo binario basado en la distancia de apiñamiento, favoreciendo las soluciones más aisladas.
+
+\textbf{Mutación polinomial.} Para mantener la diversidad del enjambre, se aplica mutación polinomial \citep{Deb2002} con índice de distribución $\eta_m = 20$ al 15\% de las partículas en cada iteración, con probabilidad $1/n$ por variable.
+
+El Algoritmo~\ref{alg:smpso} resume el procedimiento.
+
+\begin{algorithm}[H]
+\caption{SMPSO \citep{Nebro2009}}
+\label{alg:smpso}
+\begin{algorithmic}[1]
+\State inicializarEnjambre()
+\State inicializarLíderes() \Comment{archivo externo de no dominadas}
+\State $generación \gets 0$
+\While{$generación < maxGeneraciones$}
+    \For{cada partícula $i$ del enjambre}
+        \State seleccionarLíder() \Comment{torneo binario por crowding distance}
+        \State actualizarVelocidad() \Comment{Ecs. \ref{eq:pso_velocidad}, \ref{eq:constriccion} y \ref{eq:delta}}
+        \State actualizarPosición() \Comment{con rebote en los límites}
+        \State mutación() \Comment{polinomial, 15\% del enjambre}
+        \State evaluar($\vec{x}_i$)
+        \State actualizarMejorPersonal()
+        \State actualizarLíderes()
+    \EndFor
+    \State $generación \gets generación + 1$
+\EndWhile
+\State \Return archivo de líderes \Comment{aproximación del Frente de Pareto}
+\end{algorithmic}
+\end{algorithm}
+
+SMPSO demostró desempeño competitivo o superior frente a NSGA-II, SPEA2, OMOPSO, MOEA/D y otros algoritmos del estado del arte en los conjuntos de prueba estándar, con convergencia particularmente rápida \citep{Nebro2009}, propiedad valiosa en este framework donde cada evaluación de la función objetivo implica procesar una imagen completa.
+
+\section{Métodos de decisión multicriterio}
+\label{sec:mcdm}
+
+La optimización multiobjetivo entrega un conjunto de soluciones matemáticamente incomparables entre sí. Sin embargo, la aplicación práctica requiere seleccionar \textit{una} solución final. Esta selección es el objeto de los métodos de decisión multicriterio (MCDM, \textit{Multi-Criteria Decision Making}), que en este framework operan \textit{a posteriori}: primero se genera el Frente de Pareto completo y luego se decide sobre él, sin requerir que el decisor articule preferencias antes de conocer las alternativas disponibles.
+
+\subsection{Matriz de decisión, normalización y pesos}
+\label{sec:matriz_decision}
+
+El punto de partida de todo método MCDM es la \textbf{matriz de decisión} $X = [x_{ij}]_{m \times n}$, donde cada fila representa una alternativa $A_i$ (una solución del Frente de Pareto), cada columna un criterio $C_j$ (una función objetivo) y $x_{ij}$ el desempeño de la alternativa $i$ en el criterio $j$. Los criterios se clasifican en criterios de \textit{beneficio} (a maximizar) y de \textit{costo} (a minimizar); en este trabajo los tres criterios (entropía, SSIM, VIF) son de beneficio.
+
+\textbf{Normalización.} Dado que los criterios se expresan en escalas distintas (la entropía en bits, SSIM y VIF adimensionales en rangos diferentes), las matrices deben normalizarse. Cada método MCDM define su propia técnica de normalización como parte integral del método; las más comunes son:
+
+\begin{itemize}
+    \item \textit{Lineal max-min:} $r_{ij} = (x_{ij} - \min_i x_{ij}) / (\max_i x_{ij} - \min_i x_{ij})$
+    \item \textit{Vectorial:} $r_{ij} = x_{ij} / \sqrt{\sum_i x_{ij}^2}$
+    \item \textit{Por suma:} $r_{ij} = x_{ij} / \sum_i x_{ij}$
+\end{itemize}
+
+En este trabajo se respeta la normalización canónica de cada método (detallada en la Tabla~\ref{tab:normalizaciones}), puesto que sustituirla produciría variantes no estándar de los métodos y comprometería la comparabilidad con la literatura.
+
+\begin{table}[H]
+\centering
+\caption{Técnicas de normalización canónicas de los métodos MCDM empleados.}
+\label{tab:normalizaciones}
+\begin{tabular}{lll}
+\hline
+\textbf{Método} & \textbf{Normalización} & \textbf{Observación} \\
+\hline
+SMARTER & Lineal max-min & Función de utilidad en $[0,1]$ \\
+TOPSIS & Vectorial & Distancias euclidianas \\
+Bellman-Zadeh & Lineal max-min & Funciones de pertenencia difusas \\
+PROMETHEE II & No normaliza & Funciones de preferencia sobre diferencias \\
+GRA & Lineal max-min & Secuencia de referencia \\
+VIKOR & Lineal max-min & Sobre distancias al ideal \\
+CODAS & Lineal max-min & Distancias euclidiana y taxicab \\
+MABAC & Lineal max-min & Área de aproximación de borde \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Pesos de los criterios.} Los pesos $w_j$ (con $\sum_j w_j = 1$) expresan la importancia relativa de cada criterio. Cuando no es posible elicitar pesos exactos del decisor, se emplean \textit{pesos sustitutos} derivados únicamente del orden de importancia de los criterios \citep{Roberts2002}. Para $n$ criterios ordenados de mayor a menor importancia, las aproximaciones más utilizadas son:
+
+\begin{itemize}
+    \item \textit{Rank Order Centroid (ROC):} $w_j = \frac{1}{n} \sum_{k=j}^{n} \frac{1}{k}$
+    \item \textit{Rank Sum (RS):} $w_j = \frac{2(n + 1 - j)}{n(n+1)}$
+\end{itemize}
+
+Para $n = 3$, ROC produce $(0.611, 0.278, 0.111)$ y RS produce $(0.500, 0.333, 0.167)$. \citet{Roberts2002} muestran que ROC es la aproximación con mejor desempeño esperado cuando solo se conoce el orden de los criterios, y es la base del método SMARTER.
+
+\subsection{SMARTER}
+
+SMARTER (\textit{Simple Multi-Attribute Rating Technique Exploiting Ranks}) \citep{Edwards1994} es una simplificación de SMART en la que los pesos se derivan automáticamente del orden de importancia de los criterios mediante ROC. La puntuación de cada alternativa es una utilidad aditiva:
+
+\begin{equation}
+U_i = \sum_{j=1}^{n} w_j \, u_{ij}
+\end{equation}
+
+donde $u_{ij}$ es la utilidad normalizada de la alternativa $i$ en el criterio $j$. La mejor alternativa es la de mayor utilidad total.
+
+\subsection{TOPSIS}
+
+TOPSIS (\textit{Technique for Order Preference by Similarity to Ideal Solution}) \citep{Hwang1981} selecciona la alternativa más cercana a la solución ideal positiva $A^+$ (el mejor valor de cada criterio) y más lejana de la solución ideal negativa $A^-$. Sobre la matriz normalizada y ponderada se calculan las distancias euclidianas $d_i^+$ y $d_i^-$ de cada alternativa a $A^+$ y $A^-$, y el coeficiente de cercanía relativa:
+
+\begin{equation}
+CC_i = \frac{d_i^-}{d_i^+ + d_i^-}
+\end{equation}
+
+La mejor alternativa es la de mayor $CC_i$.
+
+\subsection{Bellman-Zadeh}
+
+El enfoque de decisión en ambiente difuso de \citet{Bellman1970} modela cada criterio como un conjunto difuso con función de pertenencia $\mu_j(A_i) \in [0, 1]$, que expresa el grado en que la alternativa $i$ satisface el criterio $j$. La decisión se define como la intersección de los conjuntos difusos:
+
+\begin{equation}
+\mu_D(A_i) = \min_{j} \, \mu_j(A_i)
+\end{equation}
+
+y la mejor alternativa es la que maximiza $\mu_D$: un criterio maximin que garantiza que la solución elegida no sea deficiente en ningún criterio.
+
+\subsection{PROMETHEE II}
+
+PROMETHEE II (\textit{Preference Ranking Organization METHod for Enrichment Evaluations}) \citep{Brans1985} construye un ranking completo mediante comparaciones por pares. Para cada par de alternativas $(A_a, A_b)$ y cada criterio $j$ se evalúa una función de preferencia $P_j(A_a, A_b) \in [0,1]$ sobre la diferencia $d_j = x_{aj} - x_{bj}$. El índice de preferencia agregado es $\pi(A_a, A_b) = \sum_j w_j P_j(A_a, A_b)$, del cual se derivan los flujos de salida $\phi^+$, de entrada $\phi^-$ y el flujo neto:
+
+\begin{equation}
+\phi(A_i) = \phi^+(A_i) - \phi^-(A_i)
+\end{equation}
+
+La mejor alternativa es la de mayor flujo neto $\phi$.
+
+\subsection{GRA}
+
+GRA (\textit{Grey Relational Analysis}) \citep{Deng1989} proviene de la teoría de sistemas grises. Tras normalizar la matriz, se define la secuencia de referencia ideal $x_0$ y se calcula el coeficiente de relación gris de cada alternativa con la referencia en cada criterio:
+
+\begin{equation}
+\gamma_{ij} = \frac{\Delta_{\min} + \zeta \, \Delta_{\max}}{\Delta_{ij} + \zeta \, \Delta_{\max}}
+\end{equation}
+
+donde $\Delta_{ij} = |x_{0j} - r_{ij}|$ y $\zeta \in [0,1]$ es el coeficiente de distinción (habitualmente $0.5$). El grado de relación gris de cada alternativa es el promedio ponderado $\Gamma_i = \sum_j w_j \gamma_{ij}$, y la mejor alternativa es la de mayor $\Gamma_i$.
+
+\subsection{VIKOR}
+
+VIKOR (\textit{VIseKriterijumska Optimizacija I Kompromisno Resenje}) \citep{Opricovic2004} busca una solución de compromiso aceptable para el decisor. Para cada alternativa calcula la utilidad grupal $S_i$ (suma ponderada de distancias al ideal) y el arrepentimiento individual $R_i$ (máxima distancia ponderada), y los combina en el índice:
+
+\begin{equation}
+Q_i = v \, \frac{S_i - S^*}{S^- - S^*} + (1 - v) \, \frac{R_i - R^*}{R^- - R^*}
+\end{equation}
+
+donde $v$ (habitualmente $0.5$) pondera entre la estrategia de mayoría y la de veto individual. La mejor alternativa es la de menor $Q_i$, sujeta a condiciones de ventaja aceptable y estabilidad de la decisión.
+
+\subsection{CODAS}
+
+CODAS (\textit{COmbinative Distance-based ASsessment}) \citep{KeshavarzGhorabaee2016} evalúa las alternativas por su distancia a la solución ideal negativa, combinando la distancia euclidiana $E_i$ como medida principal y la distancia taxicab $T_i$ como desempate cuando las distancias euclidianas son próximas (según un umbral $\tau$). La puntuación de evaluación relativa entre alternativas se acumula en:
+
+\begin{equation}
+H_i = \sum_{k=1}^{m} \left[ (E_i - E_k) + \psi(E_i - E_k)(T_i - T_k) \right]
+\end{equation}
+
+donde $\psi$ es una función umbral que activa la distancia taxicab solo ante empates prácticos. La mejor alternativa es la de mayor $H_i$.
+
+\subsection{MABAC}
+
+MABAC (\textit{Multi-Attributive Border Approximation area Comparison}) \citep{Pamucar2015} define, para cada criterio, un área de aproximación de borde (BAA) calculada como la media geométrica de los valores normalizados y ponderados de todas las alternativas:
+
+\begin{equation}
+g_j = \left( \prod_{i=1}^{m} v_{ij} \right)^{1/m}
+\end{equation}
+
+La distancia de cada alternativa al borde, $q_{ij} = v_{ij} - g_j$, indica su pertenencia al área de aproximación superior (mejor que el borde) o inferior. La puntuación total es $S_i = \sum_j q_{ij}$ y la mejor alternativa es la de mayor $S_i$.
+
+\subsection{Selección a posteriori y consenso}
+
+Los ocho métodos difieren en sus supuestos (compensación entre criterios, forma de agregación, tratamiento de los extremos), por lo que pueden seleccionar soluciones distintas del mismo Frente de Pareto. Esta diversidad, lejos de ser un defecto, permite dos análisis valiosos: (i) el grado de \textbf{concordancia} entre métodos, que indica cuán robusta es la selección frente al método elegido, y (ii) la identificación de una solución de \textbf{consenso}, definida como la alternativa seleccionada por la mayor cantidad de métodos. Ambos análisis forman parte del diseño experimental descrito en el Capítulo~\ref{Chapter4}.

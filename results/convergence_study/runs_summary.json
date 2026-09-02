@@ -1,0 +1,44 @@
+[
+  {
+    "image_id": "194",
+    "archive_size": 200,
+    "status": "success",
+    "elapsed": 5268.483160734177,
+    "final_front": 200
+  },
+  {
+    "image_id": "308",
+    "archive_size": 100,
+    "status": "success",
+    "elapsed": 5268.868519306183,
+    "final_front": 100
+  },
+  {
+    "image_id": "167",
+    "archive_size": 100,
+    "status": "success",
+    "elapsed": 5272.978312730789,
+    "final_front": 100
+  },
+  {
+    "image_id": "308",
+    "archive_size": 200,
+    "status": "success",
+    "elapsed": 5275.358108520508,
+    "final_front": 200
+  },
+  {
+    "image_id": "194",
+    "archive_size": 100,
+    "status": "success",
+    "elapsed": 5286.288325786591,
+    "final_front": 100
+  },
+  {
+    "image_id": "167",
+    "archive_size": 200,
+    "status": "success",
+    "elapsed": 5289.0906727313995,
+    "final_front": 200
+  }
+]

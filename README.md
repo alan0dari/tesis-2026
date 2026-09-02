@@ -18,7 +18,7 @@ El framework permite mejorar el contraste de ortopantomografías (radiografías 
 - **Métricas de Evaluación**: 
   - Entropía de Shannon
   - SSIM (Structural Similarity Index)
-  - VQI (Visual Quality Index)
+  - VIF (Visual Information Fidelity, Sheikh & Bovik 2006)
 - **Frente de Pareto 3D**: Visualización de soluciones óptimas en espacio 3D
 - **8 Métodos MCDM**: Selección de la mejor solución usando múltiples criterios
 
@@ -32,7 +32,7 @@ tesis-2026/
 │   ├── metrics/                # Métricas de evaluación
 │   │   ├── entropy.py
 │   │   ├── ssim.py
-│   │   └── vqi.py
+│   │   └── vif.py
 │   ├── optimization/           # Optimización multiobjetivo
 │   │   ├── smpso.py
 │   │   └── pareto.py
@@ -124,16 +124,16 @@ save_image(enhanced_image, 'results/enhanced.png')
 ```python
 from metrics.entropy import calculate_entropy
 from metrics.ssim import calculate_ssim
-from metrics.vqi import calculate_vqi
+from metrics.vif import calculate_vif
 
 # Calcular métricas
 entropy_val = calculate_entropy(enhanced_image)
 ssim_val = calculate_ssim(image, enhanced_image)
-vqi_val = calculate_vqi(enhanced_image)
+vif_val = calculate_vif(image, enhanced_image)
 
 print(f"Entropía: {entropy_val:.4f}")
 print(f"SSIM: {ssim_val:.4f}")
-print(f"VQI: {vqi_val:.4f}")
+print(f"VIF: {vif_val:.4f}")
 ```
 
 ### 3. Optimización con SMPSO
@@ -149,9 +149,9 @@ def objective_function(params):
     
     entropy = calculate_entropy(enhanced)
     ssim = calculate_ssim(image, enhanced)
-    vqi = calculate_vqi(enhanced)
+    vif = calculate_vif(image, enhanced)
     
-    return [entropy, ssim, vqi]
+    return [entropy, ssim, vif]
 
 # Ejecutar SMPSO
 optimizer = SMPSO(
@@ -207,11 +207,11 @@ Donde p_i es la probabilidad del i-ésimo nivel de gris.
 #### 2. SSIM (Structural Similarity Index)
 Evalúa la similitud estructural entre imagen original y mejorada, considerando luminancia, contraste y estructura.
 
-#### 3. VQI (Visual Quality Index)
-Índice de calidad visual que evalúa la percepción humana de la imagen.
+#### 3. VIF (Visual Information Fidelity)
+Índice de fidelidad de la información visual (Sheikh & Bovik, 2006). Cuantifica, desde la teoría de la información, cuánta información visual de la imagen de referencia puede extraer un observador de la imagen procesada. A diferencia de SSIM, puede superar 1.0 cuando el realce agrega información perceptible.
 
 ### SMPSO (Speed-constrained Multi-objective PSO)
-Algoritmo de optimización multiobjetivo basado en enjambre de partículas con restricción de velocidad, diseñado para encontrar el Frente de Pareto de soluciones óptimas.
+Algoritmo de optimización multiobjetivo basado en enjambre de partículas con restricción de velocidad (Nebro et al., 2009). La implementación sigue la formulación canónica: coeficiente de constricción de Clerc-Kennedy, C1, C2 ~ U(1.5, 2.5), peso de inercia w = 0.1, mutación polinomial sobre el 15% del enjambre y archivo externo con crowding distance.
 
 ### Métodos de Decisión Multicriterio (MCDM)
 
@@ -292,6 +292,8 @@ Los resultados de los experimentos se guardan en el directorio `results/`:
 
 ### Optimización Multiobjetivo
 - Nebro, A. J., et al. (2009). SMPSO: A new PSO-based metaheuristic for multi-objective optimization.
+- Sheikh, H. R., & Bovik, A. C. (2006). Image information and visual quality. IEEE TIP 15(2).
+- More, L. G., et al. (2015). Parameter tuning of CLAHE based on multi-objective optimization. IEEE ICIP 2015.
 
 ### Métodos MCDM
 - Hwang, C. L., & Yoon, K. (1981). Multiple Attribute Decision Making: Methods and Applications.

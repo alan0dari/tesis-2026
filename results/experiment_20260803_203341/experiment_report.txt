@@ -1,0 +1,53 @@
+================================================================================
+REPORTE DE RESULTADOS DEL EXPERIMENTO
+Framework SMPSO-CLAHE con MCDM para mejora de radiografías dentales
+================================================================================
+
+1. RESUMEN GENERAL
+----------------------------------------
+   Imágenes procesadas: 50
+   Tiempo total: 1083.68 minutos
+   Tiempo promedio por imagen: 1300.41 ± 265.61 segundos
+
+2. MÉTRICAS DE CALIDAD (Solución de Compromiso)
+----------------------------------------
+   Entropía (H):
+      Media ± DE: 7.2097 ± 1.0530
+      IC 95%: [6.9104, 7.5089]
+      Rango: [3.5068, 7.8908]
+   SSIM:
+      Media ± DE: 0.8051 ± 0.1547
+      IC 95%: [0.7611, 0.8490]
+      Rango: [0.4400, 0.9569]
+   VIF:
+      Media ± DE: 1.1405 ± 0.2200
+      IC 95%: [1.0780, 1.2030]
+      Rango: [0.9824, 1.8252]
+
+3. PARÁMETROS CLAHE ÓPTIMOS
+----------------------------------------
+   Rx (filas): 5.18 ± 5.75 (moda: 5.0)
+   Ry (columnas): 3.54 ± 2.26 (moda: 2.0)
+   Clip limit: 1.81 ± 0.94 (moda: 1.0)
+
+4. TAMAÑO DEL FRENTE DE PARETO
+----------------------------------------
+   Promedio: 99.9 ± 0.4 soluciones
+   Rango: [97, 100]
+
+5. MEJORA DE CALIDAD
+----------------------------------------
+   Mejora en entropía: 0.8276 ± 0.4026
+   Mejora en contraste: 0.1176 ± 0.0771
+
+6. CONSENSO ENTRE MÉTODOS MCDM
+----------------------------------------
+   Acuerdo promedio: 16.7%
+   Rango de acuerdo: [0.0%, 100.0%]
+
+================================================================================
+Archivos generados:
+  - experiment_data.csv: Datos completos del experimento
+  - mcdm_agreement_matrix.csv: Matriz de acuerdo entre métodos
+  - analysis_by_degradation.csv: Análisis por tipo de degradación
+================================================================================

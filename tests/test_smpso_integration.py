@@ -59,7 +59,7 @@ def test_smpso_basic():
     # 2. Cada solucion debe tener 3 parametros
     for sol in pareto_front:
         assert len(sol.parameters) == 3, "Los parametros deben ser 3 (rx, ry, clip)"
-        assert len(sol.objectives) == 3, "Los objetivos deben ser 3 (H, SSIM, VQI)"
+        assert len(sol.objectives) == 3, "Los objetivos deben ser 3 (H, SSIM, VIF)"
     print("[OK] Todas las soluciones tienen 3 parametros y 3 objetivos")
     
     # 3. Los parametros deben estar en rango valido
@@ -73,7 +73,7 @@ def test_smpso_basic():
     objectives = pareto_front.get_decision_matrix()
     assert np.all(objectives[:, 0] > 0), "Entropia debe ser positiva"
     assert np.all(objectives[:, 1] >= 0) and np.all(objectives[:, 1] <= 1), "SSIM en [0,1]"
-    assert np.all(objectives[:, 2] > 0), "VQI debe ser positivo"
+    assert np.all(objectives[:, 2] > 0), "VIF debe ser positivo"
     print("[OK] Todos los objetivos tienen valores razonables")
     
     # 5. Probar obtener solucion de compromiso
@@ -106,7 +106,7 @@ def test_pareto_front_methods():
     # Agregar soluciones no dominadas
     solutions_data = [
         ([8, 8, 2.0], [7.5, 0.95, 85.0]),   # Mejor SSIM
-        ([16, 16, 3.0], [7.8, 0.90, 90.0]), # Mejor VQI
+        ([16, 16, 3.0], [7.8, 0.90, 90.0]), # Mejor VIF
         ([12, 12, 2.5], [7.9, 0.88, 82.0]), # Mejor entropia
         ([10, 10, 2.2], [7.6, 0.92, 87.0]), # Balanceada
     ]
@@ -133,10 +133,10 @@ def test_pareto_front_methods():
     # Test get_best_by_objective
     best_entropy = front.get_best_by_objective(0)
     best_ssim = front.get_best_by_objective(1)
-    best_vqi = front.get_best_by_objective(2)
+    best_vif = front.get_best_by_objective(2)
     print(f"[OK] Mejor entropia: {best_entropy.objectives[0]:.4f}")
     print(f"[OK] Mejor SSIM: {best_ssim.objectives[1]:.4f}")
-    print(f"[OK] Mejor VQI: {best_vqi.objectives[2]:.2f}")
+    print(f"[OK] Mejor VIF: {best_vif.objectives[2]:.2f}")
     
     # Test get_compromise_solution
     compromise = front.get_compromise_solution()

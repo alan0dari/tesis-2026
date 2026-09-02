@@ -1,204 +1,256 @@
-\documentclass[12pt,letterpaper,twoside]{book}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Libro de Tesis
+% Basado en la plantilla Thesis (LaTeXTemplates, Steven Gunn / Sunil Patel)
+% Estructura tomada del libro de referencia de la Facultad Politécnica - UNA
+% License: CC BY-NC-SA 3.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt, a4paper, oneside]{Thesis}
+
+\graphicspath{{./Figures/}}
+
+\usepackage[square, numbers, comma, sort&compress]{natbib}
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+\usepackage{float}
+\usepackage{mathrsfs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{flushend}
+\usepackage[justification=centering]{caption}
+\usepackage[spanish,es-tabla]{babel}
+\selectlanguage{spanish}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{enumitem}
+\usepackage{verbatim}
+\usepackage{tablefootnote}
+\usepackage{diagbox}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage[left=3cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
-\usepackage{setspace}
-\usepackage{fancyhdr}
-\usepackage{cite}
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{algorithm}
-\usepackage{algorithmic}
-\usepackage{listings}
-\usepackage{xcolor}
+\usepackage{array}
+\usepackage{adjustbox}
+\usepackage{pdfpages}
+\pdfcompresslevel=9
+\pdfimageresolution=70
+\hyphenation{op-tical net-works semi-conduc-tor}
+\usepackage{nomencl}
+\makenomenclature
+\usepackage{pdflscape}
+\captionsetup[figure]{labelfont=bf, textfont=small}
 
-% Configuración de hiperenlaces
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan,
-    citecolor=blue,
-    pdftitle={Framework CLAHE-MCDM},
-    pdfauthor={Autor},
-}
+%----------------------------------------------------------------------------------------
+%	DATOS DE LA TESIS
+%----------------------------------------------------------------------------------------
 
-% Configuración de código
-\lstset{
-    basicstyle=\ttfamily\small,
-    breaklines=true,
-    frame=single,
-    language=Python,
-    showstringspaces=false,
-    commentstyle=\color{green!50!black},
-    keywordstyle=\color{blue},
-    stringstyle=\color{red}
-}
+\thesistitle{Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}
+\authors{Luhana Araceli González Zarza \and Alan Mathías Ruiz Díaz Nodari}
+\university{Universidad Nacional de Asunción}
+\department{Facultad Politécnica}
+\subject{Procesamiento de imágenes médicas, optimización multiobjetivo, decisión multicriterio}
+\keywords{CLAHE, SMPSO, Frente de Pareto, MCDM, ortopantomografía, VIF}
 
-% Configuración de encabezados
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE,RO]{\thepage}
-\fancyhead[RE]{\leftmark}
-\fancyhead[LO]{\rightmark}
-
-% Espaciado
-\onehalfspacing
-
-% Información del documento
-\title{Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}
-\author{Nombre del Autor}
-\date{2026}
+\hypersetup{urlcolor=blue, colorlinks=true}
+\title{\ttitle}
+\let\olditemize\itemize
+\def\itemize{\olditemize\itemsep=0pt }
 
 \begin{document}
 
-% Portada
+\frontmatter % Numeración romana (i, ii, iii...) para páginas preliminares
+
+\setstretch{1.3}
+
+\fancyhead{}
+\rhead{\thepage}
+\lhead{}
+
+\pagestyle{fancy}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+% PDF meta-data
+\hypersetup{pdftitle={\ttitle}}
+\hypersetup{pdfsubject=\subjectname}
+\hypersetup{pdfauthor=\authornames}
+\hypersetup{pdfkeywords=\keywordnames}
+
+\setcounter{secnumdepth}{5}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
 \begin{titlepage}
-    \centering
-    \vspace*{1cm}
-    
-    {\LARGE\bfseries UNIVERSIDAD NACIONAL DE ASUNCIÓN\par}
-    \vspace{0.5cm}
-    {\Large FACULTAD POLITÉCNICA\par}
-    \vspace{0.5cm}
-    {\Large PROGRAMA DE [NOMBRE]\par}
-    
-    \vspace{3cm}
-    
-    {\Huge\bfseries Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo\par}
-    
-    \vspace{3cm}
-    
-    {\Large\itshape González Zarza, Luhana Araceli\par}
-    {\Large\itshape Ruiz Díaz Nodari, Alan Mathías\par}
-    
-    \vfill
-    
-    {\large Tesis presentada como requisito para optar al título de\\
-    [Ingeniería en Informática]\par}
-    
-    \vspace{1cm}
-    
-    {\large Director: Dr./Mg. [Nombre del Director]\par}
-    
-    \vfill
-    
-    {\large San Lorenzo, Paraguay\par}
-    {\large 2026\par}
+\begin{center}
+\includegraphics[scale=1]{./Figures/logo.png} % Logo UNA - Facultad Politécnica
+
+\large \textit{INGENIERÍA EN INFORMÁTICA}\\[0.3cm]
+
+\HRule \\[0.4cm]
+{\huge \bfseries Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}\\[0.4cm]
+\HRule \\[1.5cm]
+
+\large \textit{TRABAJO FINAL DE GRADO}\\[0.3cm]
+
+\vfill
+
+\vfill
+
+\vfill
+
+\begin{minipage}{0.45\textwidth}
+\begin{center} \small
+\emph{Autores:}\\
+{Luhana Araceli González Zarza}\\
+{Alan Mathías Ruiz Díaz Nodari}
+\end{center}
+\end{minipage}
+\hfill\begin{minipage}{0.4\textwidth}
+\begin{center} \small
+\emph{Tutor:}\\
+% TODO: confirmar nombres y títulos de tutor/es
+{D.Sc. José Luis Vázquez Noguera}\\
+\end{center}
+\end{minipage}\\[1cm]
+
+\textsc{\LARGE San Lorenzo - Paraguay}\\[1.5cm]
+\textsc{\LARGE 2026}\\[1.5cm]
+
+\vfill
+\end{center}
 \end{titlepage}
 
-% Página de aprobación
-\chapter*{Nota de Aceptación}
-\addcontentsline{toc}{chapter}{Nota de Aceptación}
-
-\vspace{3cm}
-
-\noindent
-\rule{10cm}{0.5pt}\\
-Firma del Director de Tesis\\
-Dr./Mg. [Nombre]
-
-\vspace{1.5cm}
-
-\noindent
-\rule{10cm}{0.5pt}\\
-Firma del Jurado\\
-Dr./Mg. [Nombre]
-
-\vspace{1.5cm}
-
-\noindent
-\rule{10cm}{0.5pt}\\
-Firma del Jurado\\
-Dr./Mg. [Nombre]
-
-\vspace{2cm}
-
-\noindent
-Ciudad, [Fecha]
-
-\newpage
-
-% Dedicatoria
-\chapter*{Dedicatoria}
+%----------------------------------------------------------------------------------------
+%	DEDICATORIA
+%----------------------------------------------------------------------------------------
+\clearpage
 \addcontentsline{toc}{chapter}{Dedicatoria}
+\setstretch{1.3}
+\pagestyle{empty}
+\dedicatory{
 
-\vspace{3cm}
-
+% TODO: escribir dedicatoria de Luhana
 \begin{flushright}
-\textit{[Texto de dedicatoria]}
+Luhana Araceli González Zarza
 \end{flushright}
 
-\newpage
+% TODO: escribir dedicatoria de Alan
+\begin{flushright}
+Alan Mathías Ruiz Díaz Nodari
+\end{flushright}
 
-% Agradecimientos
-\chapter*{Agradecimientos}
-\addcontentsline{toc}{chapter}{Agradecimientos}
+}
+\addtocontents{toc}{\vspace{2em}}
 
-[Texto de agradecimientos]
+%----------------------------------------------------------------------------------------
+%	AGRADECIMIENTOS
+%----------------------------------------------------------------------------------------
+\clearpage
+\setstretch{1.3}
+\acknowledgements{\addtocontents{toc}{\vspace{1em}}
 
-\newpage
+% TODO: personalizar agradecimientos
+A nuestras familias, por el apoyo incondicional durante toda la carrera y la elaboración de este trabajo.
 
-% Resumen
-\chapter*{Resumen}
-\addcontentsline{toc}{chapter}{Resumen}
+A nuestro tutor, por transmitirnos sus conocimientos y guiarnos durante el proceso de realización de este trabajo.
 
-Este trabajo presenta un framework innovador para la mejora de ortopantomografías mediante la integración de técnicas de procesamiento de imágenes, optimización multiobjetivo y métodos de decisión multicriterio. El framework utiliza CLAHE (Contrast Limited Adaptive Histogram Equalization) para el realce de contraste, SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) para la optimización de parámetros, y ocho métodos MCDM (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) para la selección de la mejor imagen mejorada.
+A las personas que nos dieron sus comentarios y colaboraron con las revisiones de este libro.
 
-Los resultados experimentales demuestran que el framework propuesto mejora significativamente la calidad visual de las ortopantomografías, optimizando simultáneamente múltiples métricas objetivas (entropía, SSIM y VQI). Los métodos MCDM permiten seleccionar la solución más apropiada del Frente de Pareto según las preferencias del usuario, facilitando la toma de decisiones en aplicaciones clínicas.
+}
 
-\textbf{Palabras clave:} CLAHE, Optimización Multiobjetivo, SMPSO, MCDM, Ortopantomografía, Procesamiento de Imágenes Médicas, Frente de Pareto.
+%----------------------------------------------------------------------------------------
+%	RESUMEN
+%----------------------------------------------------------------------------------------
+\clearpage
+\addtotoc{Resumen}
+\resumen
 
-\newpage
+Las ortopantomografías son estudios radiográficos fundamentales para el diagnóstico odontológico; sin embargo, con frecuencia presentan deficiencias de contraste que dificultan su interpretación clínica. Las técnicas de mejora de contraste como CLAHE (\textit{Contrast Limited Adaptive Histogram Equalization}) pueden mitigar estas deficiencias, pero su desempeño depende fuertemente de la configuración de sus parámetros, cuya selección manual es compleja y subjetiva. Este trabajo presenta un framework de procesamiento por etapas que automatiza la mejora y la selección de la imagen radiográfica: la imagen de entrada es procesada por CLAHE, cuyos parámetros (número de regiones contextuales $R_x$, $R_y$ y límite de recorte $C$) son optimizados por el algoritmo evolutivo SMPSO (\textit{Speed-constrained Multi-objective Particle Swarm Optimization}) guiado por tres funciones objetivo en conflicto: la entropía de Shannon, el índice de similitud estructural (SSIM) y el índice de fidelidad de la información visual (VIF). El resultado de la optimización es un Frente de Pareto de soluciones no dominadas, que se mapea a una matriz de decisión sobre la cual se aplican ocho métodos de decisión multicriterio (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS y MABAC) para seleccionar de forma automática una única imagen mejorada. La experimentación se realiza sobre una muestra representativa de 83 imágenes de una base de datos pública de 598 ortopantomografías, sometidas a degradaciones controladas de contraste que permiten validar la recuperación de calidad respecto a la imagen original. La totalidad de las imágenes de la muestra recuperó fidelidad de información visual respecto a la original (ganancia media de VIF de $+0.27$, $p < 10^{-14}$). Del análisis de concordancia se identifica a SMARTER y GRA como los métodos más representativos del consenso, y se demuestra además la equivalencia ordinal entre SMARTER y MABAC bajo criterios de beneficio y normalización max-min, hallazgo con implicaciones para el diseño de esquemas de consenso. El framework resulta así una herramienta objetiva, reproducible e independiente del equipo de adquisición para asistir al profesional de la salud en escenarios de diagnóstico.
 
-% Abstract
-\chapter*{Abstract}
-\addcontentsline{toc}{chapter}{Abstract}
+\textbf{Palabras claves:} Mejora de contraste, CLAHE, Optimización multiobjetivo, SMPSO, Frente de Pareto, Métodos de decisión multicriterio, Ortopantomografía, VIF.
+\clearpage \newpage
 
-This work presents an innovative framework for enhancing orthopantomograms through the integration of image processing techniques, multi-objective optimization, and multi-criteria decision-making methods. The framework uses CLAHE (Contrast Limited Adaptive Histogram Equalization) for contrast enhancement, SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) for parameter optimization, and eight MCDM methods (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, MABAC) for selecting the best enhanced image.
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
 
-Experimental results demonstrate that the proposed framework significantly improves the visual quality of orthopantomograms by simultaneously optimizing multiple objective metrics (entropy, SSIM, and VQI). MCDM methods enable selection of the most appropriate solution from the Pareto Front according to user preferences, facilitating decision-making in clinical applications.
+\addtotoc{Abstract}
+\begin{abstract}
 
-\textbf{Keywords:} CLAHE, Multi-objective Optimization, SMPSO, MCDM, Orthopantomogram, Medical Image Processing, Pareto Front.
+Orthopantomograms are radiographic studies that are fundamental for dental diagnosis; however, they frequently exhibit contrast deficiencies that hinder their clinical interpretation. Contrast enhancement techniques such as CLAHE (Contrast Limited Adaptive Histogram Equalization) can mitigate these deficiencies, but their performance strongly depends on parameter configuration, whose manual selection is complex and subjective. This work presents a stage-based processing framework that automates the enhancement and selection of the radiographic image: the input image is processed by CLAHE, whose parameters (number of contextual regions $R_x$, $R_y$ and clip limit $C$) are optimized by the SMPSO (Speed-constrained Multi-objective Particle Swarm Optimization) evolutionary algorithm guided by three conflicting objective functions: Shannon entropy, the Structural Similarity Index (SSIM), and the Visual Information Fidelity index (VIF). The optimization yields a Pareto Front of non-dominated solutions, which is mapped to a decision matrix on which eight multi-criteria decision-making methods (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS, and MABAC) are applied to automatically select a single enhanced image. Experiments are carried out on a representative sample of 83 images from a public database of 598 orthopantomograms, subjected to controlled contrast degradations that allow validating quality recovery with respect to the original image. All images in the sample recovered visual information fidelity with respect to the original (mean VIF gain of $+0.27$, $p < 10^{-14}$). The agreement analysis identifies SMARTER and GRA as the methods most representative of the consensus, and the ordinal equivalence between SMARTER and MABAC under benefit criteria and max-min normalization is also demonstrated, a finding with implications for the design of consensus schemes. The framework thus provides an objective, reproducible, and acquisition-independent tool to assist health professionals in diagnostic scenarios.
 
-\newpage
+\end{abstract}
 
-% Tabla de contenidos
+\textbf{Keywords:} Contrast enhancement, CLAHE, Multi-objective optimization, SMPSO, Pareto Front, Multi-criteria decision-making, Orthopantomography, VIF.
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+
+\lhead{\emph{Contenido}}
 \tableofcontents
 
-% Lista de figuras
+\lhead{\emph{Lista de Figuras}}
 \listoffigures
 
-% Lista de tablas
 \listoftables
 
-\newpage
+\renewcommand{\tablename}{Tabla}
 
-% Capítulos
-\include{capitulo1}
-\include{capitulo2}
-\include{capitulo3}
-\include{capitulo4}
-\include{capitulo5}
-\include{capitulo6}
+\renewcommand{\nomname}{Abreviaturas}
+\renewcommand{\nomlabel}[1]{\textbf{#1} \hfil}
+\newcommand{\nomtext}[1]{\textit{#1}}
+\printnomenclature
 
-% Bibliografía
-\bibliographystyle{plain}
-\bibliography{bibliografia}
+%----------------------------------------------------------------------------------------
+%	LISTA DE ALGORITMOS
+%----------------------------------------------------------------------------------------
 
-% Anexos
-\appendix
-\chapter{Código Fuente}
+\clearpage
+\makeatletter
+\renewcommand{\ALG@name}{Algoritmo}
+\renewcommand{\listalgorithmname}{\'Indice de Algoritmos}
+\makeatother
+\lhead{\emph{Lista de Algoritmos}}
 
-El código fuente completo del framework está disponible en el repositorio GitHub:\\
-\url{https://github.com/alan0dari/tesis-2026}
+\listofalgorithms
 
-\chapter{Datos Experimentales}
+\setstretch{1.5}
 
-[Tablas y gráficos adicionales de experimentos]
+{}
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter % Numeración arábiga (1,2,3...)
+
+\pagestyle{fancy}
+
+\input{./Chapters/Capitulo1}
+\input{./Chapters/Capitulo2}
+\input{./Chapters/Capitulo3}
+\input{./Chapters/Capitulo4}
+\input{./Chapters/Capitulo5}
+\input{./Chapters/Capitulo6}
+
+\label{Bibliografia}
+
+\clearpage
+
+\lhead{\emph{Bibliografía}}
+
+\bibliographystyle{unsrtnat}
+
+\bibliography{Bibliografia}
 
 \end{document}

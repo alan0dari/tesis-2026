@@ -40,6 +40,11 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+# Esquema de decision: orden de importancia VIF > H > SSIM (columnas 0=H, 1=SSIM, 2=VIF)
+# Pesos ROC (Rank Order Centroid) mapeados a columnas: (H, SSIM, VIF)
+CRITERIA_RANK = [2, 0, 1]
+DEFAULT_WEIGHTS = [0.2778, 0.1111, 0.6111]
+
 # Suprimir warnings de matplotlib en procesos paralelos
 warnings.filterwarnings('ignore', category=UserWarning)
 
@@ -130,7 +135,7 @@ def print_sample_size_recommendations(population: int):
     
     # Recomendación específica para tesis
     rec = calculate_sample_size(population, 0.95, 0.10)
-    print(f"\n★ RECOMENDACIÓN PARA TESIS:")
+    print(f"\nRECOMENDACIÓN PARA TESIS:")
     print(f"  Confianza: 95%, Error: ±10%")
     print(f"  Tamaño de muestra: {rec['sample_size']} imágenes")
     print(f"  Porcentaje de población: {rec['percentage_of_population']}%")
@@ -244,6 +249,8 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
         from src.optimization.smpso import SMPSOImageOptimizer
         from src.optimization.pareto import export_pareto_front
         from src.utils.degradation import apply_random_degradation, get_image_quality_metrics
+        from src.metrics.ssim import calculate_ssim
+        from src.metrics.vif import calculate_vif
         from src.mcdm import (SMARTER, TOPSIS, BellmanZadeh, PROMETHEEII,
                               GRA, VIKOR, CODAS, MABAC)
         
@@ -259,8 +266,13 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
             return {'image_id': image_id, 'status': 'error', 'error': 'No se pudo cargar'}
         
         # 2. Aplicar degradación
+        # Semilla derivada por imagen: con una semilla global fija todas las
+        # imágenes recibirían la misma degradación "aleatoria"
+        base_seed = config.get('seed')
+        image_seed = None if base_seed is None else \
+            (base_seed + int.from_bytes(image_id.encode(), 'little')) % (2 ** 32)
         degraded, deg_type, deg_params = apply_random_degradation(
-            original, seed=config.get('seed')
+            original, seed=image_seed, force_type=config.get('degradation_type')
         )
         
         # 3. Ejecutar SMPSO
@@ -279,11 +291,13 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
         
         # 5. Aplicar métodos MCDM
         decision_matrix = pareto_front.get_decision_matrix()
-        params_matrix = pareto_front.get_parameter_matrix()
+        params_matrix = pareto_front.get_parameters_matrix()
         
-        weights = np.array(config.get('weights', [0.40, 0.35, 0.25]))
+        # Pesos ROC para el orden de importancia VIF > H > SSIM
+        # (columnas de la matriz: 0=H, 1=SSIM, 2=VIF)
+        weights = np.array(config.get('weights', DEFAULT_WEIGHTS))
         criteria_types = ['benefit', 'benefit', 'benefit']
-        
+
         mcdm_results = {}
         methods = [
             ('SMARTER', SMARTER), ('TOPSIS', TOPSIS),
@@ -291,15 +305,27 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
             ('GRA', GRA), ('VIKOR', VIKOR),
             ('CODAS', CODAS), ('MABAC', MABAC)
         ]
-        
+
         for name, MethodClass in methods:
             try:
-                method = MethodClass(weights=weights.copy(), criteria_types=criteria_types.copy())
+                if name == 'SMARTER':
+                    # SMARTER canónico: deriva sus pesos ROC del orden de
+                    # importancia de los criterios, no recibe pesos externos
+                    method = MethodClass(criteria_types=criteria_types.copy(),
+                                         use_rank_order_weights=True,
+                                         criteria_rank=CRITERIA_RANK)
+                else:
+                    method = MethodClass(weights=weights.copy(), criteria_types=criteria_types.copy())
                 best_idx, rankings = method.select(decision_matrix.copy())
+                # Orden de mejor a peor según el criterio del método
+                ranking_order = method.get_ranking_order(np.asarray(rankings))
                 mcdm_results[name] = {
                     'best_index': int(best_idx),
                     'best_params': params_matrix[best_idx].tolist(),
-                    'best_objectives': decision_matrix[best_idx].tolist()
+                    'best_objectives': decision_matrix[best_idx].tolist(),
+                    # Puntaje de cada alternativa (permite cruces entre métodos)
+                    'scores': [round(float(s), 6) for s in np.asarray(rankings).ravel()],
+                    'ranking_order': [int(i) for i in ranking_order]
                 }
             except Exception as e:
                 mcdm_results[name] = {'error': str(e)}
@@ -311,7 +337,7 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
                 idx = result['best_index']
                 votes[idx] = votes.get(idx, 0) + 1
         
-        consensus_idx = max(votes, key=votes.get) if votes else compromise.index
+        consensus_idx = max(votes, key=votes.get) if votes else pareto_front.solutions.index(compromise)
         consensus_count = votes.get(consensus_idx, 0)
         
         # 7. Guardar resultados
@@ -346,6 +372,15 @@ def process_single_image_for_experiment(args: tuple) -> Dict:
                 'original': get_image_quality_metrics(original),
                 'degraded': get_image_quality_metrics(degraded),
                 'enhanced': get_image_quality_metrics(enhanced)
+            },
+            # Validación contra la original prístina: como la degradación es
+            # artificial existe ground truth, y estas métricas full-reference
+            # miden cuánto recupera el realce respecto a la imagen sin degradar
+            'validation_vs_original': {
+                'ssim_degraded': calculate_ssim(original, degraded),
+                'ssim_enhanced': calculate_ssim(original, enhanced),
+                'vif_degraded': calculate_vif(original, degraded),
+                'vif_enhanced': calculate_vif(original, enhanced)
             }
         }
         
@@ -377,11 +412,12 @@ def run_experiment(
     iterations: int = 50,
     workers: int = 1,
     seed: int = None,
-    weights: List[float] = None
+    weights: List[float] = None,
+    balanced_degradation: bool = False
 ) -> Dict:
     """
     Ejecuta el experimento completo.
-    
+
     Args:
         data_dir: Directorio con las imágenes.
         output_dir: Directorio para resultados.
@@ -390,8 +426,10 @@ def run_experiment(
         iterations: Iteraciones para SMPSO.
         workers: Número de procesos paralelos.
         seed: Semilla para reproducibilidad.
-        weights: Pesos para MCDM [H, SSIM, VQI].
-    
+        weights: Pesos para MCDM [H, SSIM, VIF].
+        balanced_degradation: Repartir los 5 tipos de degradación en partes
+            iguales entre las imágenes en vez de sortear cada una por separado.
+
     Returns:
         Diccionario con resumen del experimento.
     """
@@ -412,8 +450,22 @@ def run_experiment(
     print(f"  Iteraciones SMPSO: {iterations}")
     print(f"  Procesos paralelos: {workers}")
     print(f"  Semilla: {seed}")
-    print(f"  Pesos MCDM: {weights or [0.40, 0.35, 0.25]}")
+    print(f"  Pesos MCDM: {weights or DEFAULT_WEIGHTS}")
     print(f"  Directorio de salida: {experiment_dir}")
+
+    # SMARTER deriva sus pesos ROC de CRITERIA_RANK y nunca recibe `weights`.
+    # Si los demás métodos corren con otros pesos, se rompe la equivalencia
+    # ordinal SMARTER=MABAC y el análisis de consenso queda inconsistente.
+    # Pasó de verdad: un experimento completo salió con los pesos preliminares
+    # y hubo que rehacer la etapa MCDM con scripts/rerun_mcdm.py.
+    if weights and not np.allclose(weights, DEFAULT_WEIGHTS, atol=1e-3):
+        print("\n  *** ADVERTENCIA ***")
+        print(f"  Los pesos indicados {weights} difieren del esquema ROC "
+              f"{DEFAULT_WEIGHTS} que SMARTER usa internamente.")
+        print("  Los 7 métodos restantes rankearán con otros pesos, así que")
+        print("  SMARTER y MABAC dejarán de coincidir y el consenso no será")
+        print("  comparable con los demás experimentos. Usar --weights sólo")
+        print("  para análisis de sensibilidad deliberado.\n")
     
     # Seleccionar muestra
     print(f"\n[1/4] Seleccionando muestra de {sample_size} imágenes...")
@@ -432,12 +484,32 @@ def run_experiment(
         'particles': particles,
         'iterations': iterations,
         'seed': seed,
-        'weights': weights or [0.40, 0.35, 0.25]
+        'weights': weights or DEFAULT_WEIGHTS
     }
     
     # Preparar argumentos para procesamiento paralelo
-    args_list = [(str(img), str(experiment_dir / "images"), config) 
-                 for img in selected_images]
+    if balanced_degradation:
+        # Reparto balanceado de los 5 tipos en lugar de sorteo independiente
+        # por imagen. Sobre 50 imágenes el sorteo libre deja grupos de tamaño
+        # muy dispar (DE ~2.8 por tipo), y el análisis por tipo de degradación
+        # pierde potencia justamente donde se lo quiere reportar.
+        from src.utils.degradation import DegradationType
+        types = list(DegradationType)
+        assignment = [types[i % len(types)] for i in range(len(selected_images))]
+        random.Random(seed).shuffle(assignment)
+
+        counts = {}
+        for t in assignment:
+            counts[t.value] = counts.get(t.value, 0) + 1
+        print(f'      Degradación balanceada: '
+              + ', '.join(f'{k}={v}' for k, v in sorted(counts.items())))
+
+        args_list = [(str(img), str(experiment_dir / "images"),
+                      {**config, 'degradation_type': deg.value})
+                     for img, deg in zip(selected_images, assignment)]
+    else:
+        args_list = [(str(img), str(experiment_dir / "images"), config)
+                     for img in selected_images]
     
     # Procesar imágenes
     print(f"\n[2/4] Procesando {len(selected_images)} imágenes...")
@@ -453,7 +525,7 @@ def run_experiment(
                 completed += 1
                 result = future.result()
                 results.append(result)
-                status = "✓" if result['status'] == 'success' else "✗"
+                status = "[OK]" if result['status'] == 'success' else "[X]"
                 print(f"      [{completed}/{len(selected_images)}] {status} {result['image_id']}")
                 if result['status'] == 'error':
                     print(f"          Error: {result.get('error', 'Unknown')}")
@@ -463,7 +535,7 @@ def run_experiment(
         for i, args in enumerate(args_list, 1):
             result = process_single_image_for_experiment(args)
             results.append(result)
-            status = "✓" if result['status'] == 'success' else "✗"
+            status = "[OK]" if result['status'] == 'success' else "[X]"
             print(f"      [{i}/{len(selected_images)}] {status} {result['image_id']}")
             if result['status'] == 'error':
                 print(f"          Error: {result.get('error', 'Unknown')}")
@@ -493,7 +565,8 @@ def run_experiment(
             'iterations': iterations,
             'workers': workers,
             'seed': seed,
-            'weights': weights or [0.40, 0.35, 0.25]
+            'weights': weights or DEFAULT_WEIGHTS,
+            'balanced_degradation': balanced_degradation
         },
         'results': {
             'successful': len(successful),
@@ -544,22 +617,34 @@ def generate_statistical_analysis(results: List[Dict], output_dir: Path) -> Dict
             'degradation_type': r['degradation_type'],
             'pareto_size': r['pareto_size'],
             'processing_time': r['processing_time'],
-            # Métricas de compromiso
-            'compromise_H': r['compromise']['objectives'][0],
-            'compromise_SSIM': r['compromise']['objectives'][1],
-            'compromise_VQI': r['compromise']['objectives'][2],
-            # Parámetros CLAHE
-            'compromise_Rx': r['compromise']['params'][0],
-            'compromise_Ry': r['compromise']['params'][1],
-            'compromise_Clip': r['compromise']['params'][2],
+            # Métricas de la solución seleccionada por el framework (consenso
+            # MCDM si está disponible; en su defecto, la de compromiso)
+            'compromise_H': (r.get('selected') or r['compromise'])['objectives'][0],
+            'compromise_SSIM': (r.get('selected') or r['compromise'])['objectives'][1],
+            'compromise_VIF': (r.get('selected') or r['compromise'])['objectives'][2],
+            # Parámetros CLAHE de la solución seleccionada
+            'compromise_Rx': (r.get('selected') or r['compromise'])['params'][0],
+            'compromise_Ry': (r.get('selected') or r['compromise'])['params'][1],
+            'compromise_Clip': (r.get('selected') or r['compromise'])['params'][2],
             # Consenso MCDM
+            'consensus_index': r['consensus']['index'],
             'consensus_votes': r['consensus']['votes'],
             'consensus_total': r['consensus']['total_methods'],
             # Métricas de mejora
             'entropy_improvement': r['metrics']['enhanced']['entropy'] - r['metrics']['degraded']['entropy'],
             'contrast_improvement': r['metrics']['enhanced']['contrast'] - r['metrics']['degraded']['contrast'],
         }
-        
+
+        # Validación contra la original prístina (ground truth de la degradación)
+        validation = r.get('validation_vs_original')
+        if validation:
+            row['val_ssim_degraded'] = validation['ssim_degraded']
+            row['val_ssim_enhanced'] = validation['ssim_enhanced']
+            row['val_ssim_recovery'] = validation['ssim_enhanced'] - validation['ssim_degraded']
+            row['val_vif_degraded'] = validation['vif_degraded']
+            row['val_vif_enhanced'] = validation['vif_enhanced']
+            row['val_vif_recovery'] = validation['vif_enhanced'] - validation['vif_degraded']
+
         # Agregar selección de cada método MCDM
         for method_name, method_result in r['mcdm_results'].items():
             if 'best_index' in method_result:
@@ -576,7 +661,7 @@ def generate_statistical_analysis(results: List[Dict], output_dir: Path) -> Dict
     stats_summary = {}
     
     # 1. Métricas de las soluciones de compromiso
-    metrics_cols = ['compromise_H', 'compromise_SSIM', 'compromise_VQI']
+    metrics_cols = ['compromise_H', 'compromise_SSIM', 'compromise_VIF']
     for col in metrics_cols:
         stats_summary[col] = {
             'mean': df[col].mean(),
@@ -645,13 +730,16 @@ def generate_statistical_analysis(results: List[Dict], output_dir: Path) -> Dict
     degradation_analysis = df.groupby('degradation_type').agg({
         'compromise_H': ['mean', 'std'],
         'compromise_SSIM': ['mean', 'std'],
-        'compromise_VQI': ['mean', 'std'],
+        'compromise_VIF': ['mean', 'std'],
         'entropy_improvement': ['mean', 'std'],
         'contrast_improvement': ['mean', 'std']
     }).round(4)
     
     degradation_analysis.to_csv(output_dir / "analysis_by_degradation.csv")
-    stats_summary['by_degradation'] = degradation_analysis.to_dict()
+    # Aplanar columnas MultiIndex (tuplas) para que sean serializables a JSON
+    degradation_flat = degradation_analysis.copy()
+    degradation_flat.columns = ['_'.join(col) for col in degradation_flat.columns]
+    stats_summary['by_degradation'] = degradation_flat.to_dict(orient='index')
     
     # 7. Mejora promedio
     stats_summary['improvement'] = {
@@ -697,7 +785,7 @@ def generate_text_report(stats: Dict, df: pd.DataFrame, output_dir: Path):
     lines.append("-" * 40)
     for metric, label in [('compromise_H', 'Entropía (H)'), 
                           ('compromise_SSIM', 'SSIM'), 
-                          ('compromise_VQI', 'VQI')]:
+                          ('compromise_VIF', 'VIF')]:
         s = stats[metric]
         ci = s['ci_95']
         lines.append(f"   {label}:")
@@ -825,10 +913,19 @@ Ejemplos de uso:
     parser.add_argument(
         '--weights',
         type=str,
-        default='0.40,0.35,0.25',
-        help='Pesos MCDM separados por coma (default: 0.40,0.35,0.25)'
+        default=','.join(str(w) for w in DEFAULT_WEIGHTS),
+        help=f'Pesos MCDM separados por coma, columnas (H, SSIM, VIF). '
+             f'Default: ROC para el orden VIF > H > SSIM ({DEFAULT_WEIGHTS}). '
+             f'Cambiarlos rompe la equivalencia ordinal SMARTER=MABAC, porque '
+             f'SMARTER siempre deriva ROC de criteria_rank y no usa este valor.'
     )
-    
+    parser.add_argument(
+        '--balanced-degradation',
+        action='store_true',
+        help='Repartir los 5 tipos de degradación en partes iguales entre las '
+             'imágenes (recomendado si se va a analizar por tipo de degradación)'
+    )
+
     args = parser.parse_args()
     
     # Solo calcular tamaño de muestra
@@ -858,7 +955,8 @@ Ejemplos de uso:
         iterations=args.iterations,
         workers=args.workers,
         seed=args.seed,
-        weights=weights
+        weights=weights,
+        balanced_degradation=args.balanced_degradation
     )
 
 

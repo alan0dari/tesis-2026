@@ -1,0 +1,163 @@
+{
+  "timestamp": "20260709_215441",
+  "config": {
+    "data_dir": "data\\original",
+    "sample_size": 83,
+    "actual_processed": 83,
+    "particles": 100,
+    "iterations": 100,
+    "workers": 5,
+    "seed": 42,
+    "weights": [
+      0.4,
+      0.35,
+      0.25
+    ]
+  },
+  "results": {
+    "successful": 83,
+    "failed": 0,
+    "failed_images": []
+  },
+  "analysis": {
+    "compromise_H": {
+      "mean": 7.0685256378611685,
+      "std": 1.2144647178237438,
+      "min": 2.9701473216947143,
+      "max": 7.930227967681204,
+      "median": 7.493967553711749,
+      "ci_95": [
+        6.803339883619456,
+        7.333711392102881
+      ]
+    },
+    "compromise_SSIM": {
+      "mean": 0.8235679002872675,
+      "std": 0.11011812136126096,
+      "min": 0.5567974594197156,
+      "max": 0.9357984811902719,
+      "median": 0.8660632397649828,
+      "ci_95": [
+        0.7995229390460761,
+        0.8476128615284588
+      ]
+    },
+    "compromise_VIF": {
+      "mean": 1.1486061136196053,
+      "std": 0.2242156195767451,
+      "min": 0.9119822008480295,
+      "max": 1.7097899859250465,
+      "median": 1.037683670090155,
+      "ci_95": [
+        1.099647270009246,
+        1.1975649572299647
+      ]
+    },
+    "compromise_Rx": {
+      "mean": 5.650602409638554,
+      "std": 5.480416876923886,
+      "mode": 2.0,
+      "min": 2.0,
+      "max": 39.0
+    },
+    "compromise_Ry": {
+      "mean": 3.5903614457831323,
+      "std": 3.2121573351584947,
+      "mode": 2.0,
+      "min": 2.0,
+      "max": 22.0
+    },
+    "compromise_Clip": {
+      "mean": 1.686126302720341,
+      "std": 0.2664139982594899,
+      "mode": 1.0203706503071184,
+      "min": 1.0203706503071184,
+      "max": 2.3273877622973598
+    },
+    "pareto_size": {
+      "mean": 99.98795180722891,
+      "std": 0.10976425998969033,
+      "min": 99,
+      "max": 100
+    },
+    "processing_time": {
+      "mean_seconds": 1449.7784153697003,
+      "std_seconds": 233.5415932467362,
+      "total_minutes": 2005.5268079280854
+    },
+    "mcdm_agreement": {
+      "mean_agreement": 11.660929432013768,
+      "min_agreement": 0.0,
+      "max_agreement": 100.0
+    },
+    "by_degradation": {
+      "low_contrast": {
+        "compromise_H_mean": 7.2932,
+        "compromise_H_std": 0.1605,
+        "compromise_SSIM_mean": 0.8549,
+        "compromise_SSIM_std": 0.0167,
+        "compromise_VIF_mean": 1.4543,
+        "compromise_VIF_std": 0.1584,
+        "entropy_improvement_mean": 1.1484,
+        "entropy_improvement_std": 0.1381,
+        "contrast_improvement_mean": 0.1638,
+        "contrast_improvement_std": 0.0133
+      },
+      "overexposure": {
+        "compromise_H_mean": 7.7935,
+        "compromise_H_std": 0.085,
+        "compromise_SSIM_mean": 0.9083,
+        "compromise_SSIM_std": 0.0118,
+        "compromise_VIF_mean": 0.9921,
+        "compromise_VIF_std": 0.0433,
+        "entropy_improvement_mean": 0.7235,
+        "entropy_improvement_std": 0.0977,
+        "contrast_improvement_mean": 0.0834,
+        "contrast_improvement_std": 0.0171
+      },
+      "poor_local_contrast": {
+        "compromise_H_mean": 7.8254,
+        "compromise_H_std": 0.0595,
+        "compromise_SSIM_mean": 0.8998,
+        "compromise_SSIM_std": 0.0142,
+        "compromise_VIF_mean": 0.973,
+        "compromise_VIF_std": 0.0294,
+        "entropy_improvement_mean": 0.3449,
+        "entropy_improvement_std": 0.0805,
+        "contrast_improvement_mean": 0.0984,
+        "contrast_improvement_std": 0.0306
+      },
+      "skewed_histogram": {
+        "compromise_H_mean": 7.5551,
+        "compromise_H_std": 0.2599,
+        "compromise_SSIM_mean": 0.8075,
+        "compromise_SSIM_std": 0.0887,
+        "compromise_VIF_mean": 1.038,
+        "compromise_VIF_std": 0.0853,
+        "entropy_improvement_mean": 0.7742,
+        "entropy_improvement_std": 0.1339,
+        "contrast_improvement_mean": 0.0907,
+        "contrast_improvement_std": 0.0341
+      },
+      "underexposure": {
+        "compromise_H_mean": 4.7752,
+        "compromise_H_std": 1.1795,
+        "compromise_SSIM_mean": 0.6269,
+        "compromise_SSIM_std": 0.0744,
+        "compromise_VIF_mean": 1.0935,
+        "compromise_VIF_std": 0.0957,
+        "entropy_improvement_mean": 0.8377,
+        "entropy_improvement_std": 0.2722,
+        "contrast_improvement_mean": 0.0647,
+        "contrast_improvement_std": 0.0225
+      }
+    },
+    "improvement": {
+      "entropy_mean": 0.8116746631647641,
+      "entropy_std": 0.3096538135053615,
+      "contrast_mean": 0.10702597833859791,
+      "contrast_std": 0.044285430637654076
+    }
+  },
+  "total_time_seconds": 24476.807023763657
+}

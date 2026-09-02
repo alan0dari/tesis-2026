@@ -1,0 +1,433 @@
+\documentclass[sigplan,screen]{acmart}
+%% NOTE that a single column version is required for 
+%% submission and peer review. This can be done by changing
+%% the \doucmentclass[...]{acmart} in this template to 
+%% \documentclass[manuscript,screen,review]{acmart}
+%% 
+%% To ensure 100% compatibility, please check the white list of
+%% approved LaTeX packages to be used with the Master Article Template at
+%% https://www.acm.org/publications/taps/whitelist-of-latex-packages 
+%% before creating your document. The white list page provides 
+%% information on how to submit additional LaTeX packages for 
+%% review and adoption.
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2020}
+\acmYear{2020}
+\acmDOI{10.1145/3377929.3390064}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[GECCO '20]{GECCO '20: Proceedings of the 2020 Genetic and Evolutionary Computation Conference Companion}{July 2020, Pages 163-164}{Cancún, Mexico}
+\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+  June 03--05, 2018, Woodstock, NY}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\usepackage[spanish, es-noshorthands]{babel}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{svg}
+\usepackage{parskip}
+\selectlanguage{spanish}
+
+
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Framework basado en aplicación de métodos de decisión multicriterio para selección de imagen radiográfica mejorada con optimización multiobjetivo}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Univ. Luhana A. González Z.}
+\email{lulu08zarza@fpuna.edu.py}
+\affiliation{%
+  \institution{Facultad Politécnica - Universidad Nacional de Asunción}
+  \city{San Lorenzo}
+  \state{Central}
+  \country{Paraguay}
+}
+
+\author{Univ. Alan M. Ruiz Díaz N.}
+\email{alan0dari96@fpuna.edu.py}
+\affiliation{%
+  \institution{Facultad Politécnica - Universidad Nacional de Asunción}
+  \city{San Lorenzo}
+  \state{Central}
+  \country{Paraguay}
+}
+
+\author{PhD. Diego P. Pinto-Roa}
+\email{dpinto@pol.una.py}
+\affiliation{%
+  \institution{Facultad Politécnica - Universidad Nacional de Asunción}
+  \city{San Lorenzo}
+  \state{Central}
+  \country{Paraguay}
+}
+
+\author{PhD. José L. Vázquez N.}
+\email{jlvazquez@pol.una.py}
+\affiliation{%
+  \institution{Facultad Politécnica - Universidad Nacional de Asunción}
+  \city{San Lorenzo}
+  \state{Central}
+  \country{Paraguay}
+}
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{González y Ruiz Díaz, et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+  Las imágenes radiográficas sufren de varios problemas tales como bajo contraste, ruido y opacidad. La Ecualización de Histograma Adaptativo con Límite de Contraste (CLAHE, por sus siglas en inglés) es un algoritmo de mejora de contraste local ampliamente utilizado que puede resolver este problema. No hay valores fijos de los parámetros de entrada de CLAHE que siempre produzcan las mejores imágenes de salida en términos de mejora de contraste para imágenes radiográficas, por lo que para encontrar los parámetros que satisfagan la condición de óptimo en una imagen radiográfica utilizamos el algoritmo de Optimización Multiobjetivo por Enjambre de Partículas con Velocidad Controlada (SMPSO, por sus siglas en inglés), guiado por tres funciones objetivo en conflicto: la entropía de Shannon, el índice de similitud estructural (SSIM) y el índice de fidelidad de la información visual (VIF). Dado que la salida es un conjunto de soluciones (llamado Frente de Pareto), en este documento proponemos utilizar y comparar ocho métodos de decisión \textit{a posteriori} con un enfoque multicriterio, con el fin de seleccionar automáticamente una única imagen mejorada. El framework se valida sobre una muestra representativa de 83 ortopantomografías sometidas a degradaciones de contraste controladas, lo que permite medir objetivamente la recuperación de información visual respecto a la imagen original. La totalidad de las imágenes recuperó fidelidad de información visual ($+0.268$ de VIF, $p<10^{-14}$) y el 81.9\% recuperó además similitud estructural. Del análisis de concordancia entre los métodos de decisión se concluye que SMARTER y GRA son los más representativos del consenso, y se demuestra además que SMARTER y MABAC son ordinalmente equivalentes bajo criterios de beneficio y normalización max-min, hallazgo con consecuencias directas para el diseño de esquemas de consenso entre métodos multicriterio.
+\end{abstract}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{imagen radiográfica, mejora de contraste, entropía, similitud estructural, fidelidad de la información visual, optimización multiobjetivo, Frente de Pareto, enjambre de partículas, métodos de decisión multicriterio, algoritmo evolutivo}
+
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introducción}
+
+Las imágenes radiográficas juegan un papel importante en la observación de posibles anomalías en el cuerpo. Las radiografías panorámicas dentales, también conocidas como ortopantomografías, permiten obtener una visión amplia de los dientes, maxilares y estructuras circundantes. Se emplean para detectar problemas como caries, dientes incluidos, quistes, tumores, problemas en la articulación y para planificar tratamientos como ortodoncia, implantes y extracciones. Las ortopantomografías  presentan habitualmente problemas de bajo contraste, ruido y deficiente diferenciación estructural, dificultando la interpretación clínica \cite{Wang2005}. Una adecuada alteración del contraste en estas imágenes mejora significativamente la visibilidad de estructuras óseas y dentales, permitiendo evaluar claramente su disposición e integridad \cite{More2015}. Además, un incremento controlado de luminosidad contribuye a realzar los tejidos blandos circundantes, facilitando su distinción visual \cite{Pizer1987}. Debido a las variaciones locales en radiografías dentales, cada región anatómica requiere un tratamiento específico para exponer correctamente su morfología, justificando así el uso del método adaptativo CLAHE \cite{Zuiderveld1994}.\par
+La Ecualización de Histograma Adaptativo con Límite de Contraste (CLAHE) es eficaz para mejorar localmente el contraste debido a su adaptación local y control del ruido \cite{Pizer1987}. La ecualización de histogramas ajusta las probabilidades de aparición de niveles de gris hacia valores más uniformes, incrementando la Entropía y proporcionando mayor información visual, pero también introduciendo una distorsión estructural significativa \cite{Tsai2008}. Por ello, la Entropía y el Índice de Similitud Estructural (SSIM) suelen presentar una relación inversamente proporcional; altos valores de Entropía implican potencialmente menores valores de SSIM debido a dicha distorsión \cite{Wang2004}. Por su parte, el Índice de Fidelidad de la Información Visual (VIF) cuantifica, desde la teoría de la información, cuánta información visual de la imagen de referencia permanece extraíble en la imagen procesada; a diferencia del SSIM, puede superar el valor unitario cuando el realce agrega información perceptible, lo que lo hace especialmente adecuado como objetivo de mejora de contraste \cite{Sheikh2006}.\par
+El SSIM específicamente evalúa cómo una degradación en la imagen afecta la percepción estructural humana, siendo sensible a cambios en luminancia, contraste y estructura visual \cite{Wang2004}. Estas métricas resultan fundamentales en la mejora y selección objetiva de imágenes médicas, dada su relevancia clínica y perceptual. Se excluye explícitamente el PSNR por su baja correlación con la percepción visual clínica \cite{Girod1993}.\par
+Para determinar automáticamente los parámetros óptimos del método CLAHE, se utiliza la técnica SMPSO (Optimización Multiobjetivo por Enjambre de Partículas con Restricción de Velocidad). En cada iteración, el SMPSO genera partículas representando diferentes combinaciones de parámetros CLAHE, cuyo movimiento está dirigido por memoria histórica, aleatoriedad y parámetros específicos del algoritmo \cite{Nebro2009}. La salida final del SMPSO es un Frente de Pareto compuesto por soluciones no dominadas, que representan las combinaciones óptimas de parámetros CLAHE en términos de Entropía, SSIM y VIF.\par
+Dado que el Frente de Pareto contiene muchas soluciones, no es factible que un profesional médico evalúe visualmente todas las imágenes resultantes. Por ello, se requiere la aplicación de métodos multicriterio \textit{a posteriori}, que mediante cálculos matemáticos y criterios ponderados simulan la decisión visual y práctica del especialista \cite{Parreiras2006}. Las soluciones ubicadas en los extremos del Frente de Pareto suelen ser poco útiles clínicamente; una similitud estructural máxima implica ausencia de mejoras significativas respecto a la imagen original, mientras que una entropía máxima indica una imagen con alto nivel de distorsión y ruido visual. Esto enfatiza la necesidad de métodos multicriterio, los cuales actualmente no han sido suficientemente estudiados en el estado del arte para aplicaciones en radiografías dentales.\par
+Este trabajo propone un \textit{framework} completo y fundamentado para seleccionar objetiva y eficientemente imágenes radiográficas dentales mejoradas alineadas con criterios clínicos específicos de expertos médicos. El documento se estructura en las siguientes secciones: la Sección 2 detalla el flujo de trabajo propuesto, la Sección 3 describe el marco teórico del método CLAHE, las métricas consideradas y el algoritmo SMPSO. La Sección 4 presenta los métodos de decisión multicriterio empleados, la Sección 5 los experimentos realizados y sus resultados, y finalmente, la Sección 6 expone las conclusiones derivadas.\par
+
+\section{Flujo Propuesto}
+Un \textit{framework} (marco de trabajo, por su traducción al español) es un conjunto de conceptos, prácticas y criterios para enfocar un tipo de problemática particular; y que sirve como referencia, para enfrentar y resolver nuevos problemas de índole similar. Este trabajo propone un framework que engloba los procesos de: normalización, mejora de contraste, optimización multiobjetivo, toma de decisión multicriterio y evaluación médica de los resultados. La aplicación de este framework está dirigida a imágenes médicas.\par
+CLAHE tiene dos parámetros de entrada principales: una región contextual rectangular de tamaño $(\mathcal{R}_x, \mathcal{R}_y)$ en la que se divide la imagen y un límite $\mathcal{C}$, el cual restringe la amplificación excesiva del contraste para evitar sobresaturación y pérdida de detalles en la imagen. Puesto que no se conocen los parámetros de entrada adecuados, se ajustan mediante un proceso evolutivo basado en el algoritmo SMPSO. Como resultado de este proceso se obtiene un conjunto de soluciones óptimas que, desplegadas en el espacio de objetivos tridimensional, forman una superficie llamada Frente de Pareto. La tarea de seleccionar una solución única se realiza mediante los métodos de decisión \textit{a posteriori} multicriterio. Al tener un enfoque multicriterio los métodos de decisión tienen en cuenta al mismo tiempo la entropía, el SSIM y el VIF al momento de procesar la elección. La ponderación de los criterios se traduce en la preferencia de un atributo visual sobre otro. Una vez seleccionada una solución con el método de decisión se hace la correspondencia a su respectiva imagen mejorada por CLAHE, utilizando dicha solución como parámetros de entrada. La imagen mejorada es evaluada por un profesional médico, el cual garantiza la utilidad en un escenario de diagnóstico. El marco propuesto se ve ilustrado en la Figura \ref{fig:figura1}.
+
+\begin{figure*}[t]
+    \centering
+    % Figura generada con scripts/generate_framework_figure.py a partir de una
+    % ejecución real del pipeline
+    \includegraphics[width=0.92\textwidth]{framework.pdf}
+    \caption{Flujo propuesto por el que pasa una radiografía para ser mejorada: (1) entrada degradada, (2) optimización SMPSO de los parámetros de CLAHE, (3) Frente de Pareto 3D, (4) matriz de decisión, (5) selección multicriterio a posteriori y (6) imagen mejorada de salida.}
+    \Description{Diagrama del flujo de procesamiento y selección de una radiografía mejorada.}
+    \label{fig:figura1}
+\end{figure*}
+
+\section{Marco Teórico}
+
+\subsection{Antecedentes}
+Existen propuestas que trabajan en las mejoras locales de una imagen y son útiles a la hora de mejorar los detalles en imágenes médicas [6, 7, 8]. En cuanto a la optimización multiobjetivo en el estado del arte se muestran diversas propuestas basadas en metaheurísticas donde un algoritmo genético es utilizado [9]. Existe un enfoque similar al presentado en este trabajo [10], con la diferencia de que se centra en un solo objetivo y por lo tanto solo hay una imagen de salida. Otro trabajo en el estado del arte utiliza una metaheurística basada en sumas ponderadas en un problema multiobjetivo [11].\par
+El trabajo que presenta este documento puede ser considerado como una extensión importante de [1]. El punto de partida establecido es la aplicación de optimización multiobjetivo, en busca de determinar el conjunto óptimo de imágenes radiográficas de salida. En el desarrollo que se propone, se complementa el final abierto del trabajo mencionado anteriormente, con la reducción de un conjunto de soluciones óptimas a una única solución a través de métodos de decisión multicriterio. Una relación entre los métodos de decisión y su aplicación a problemas de optimización multiobjetivo en imágenes médicas aún no fue contemplada en el estado del arte. Además, se estructura el proceso como un flujo que cuenta con la validación de expertos médicos.\par
+Para tener un mejor entendimiento de la composición de la herramienta propuesta procedemos a ilustrar los conceptos básicos, pseudocódigos y ecuaciones utilizadas en las siguientes subsecciones.
+
+\subsection{CLAHE}
+Es una variación del método AHE [3]. La diferencia radica en que se añade un límite de mejora de contraste para controlar el nivel de ruido que se añade en el proceso de mejora. CLAHE depende de dos parámetros que determinan su eficiencia: tamaño de la región contextual $(R_x,R_y)$ y límite de mejora $C$. El método particiona la imagen original en varias regiones contextuales y en cada región genera un histograma local. Si un nivel de gris supera en ocurrencia de píxeles al valor $C$, entonces el excedente de píxeles se redistribuye uniformemente en el histograma local. En el área de imágenes médicas se demostró que el método CLAHE realiza un mejor desempeño en el procesamiento [3, 12].
+
+\subsection{Métricas de evaluación consideradas}
+Para medir la eficacia de CLAHE sobre radiografías, se tienen en cuenta tres atributos asociados al proceso de mejora de contraste: la entropía como indicador de cantidad de información, la similitud estructural como indicador de preservación de la estructura, y la fidelidad de la información visual como indicador perceptual de ganancia o pérdida de información.
+
+\subsubsection{Entropía \cite{Shannon1948}}
+Mide el nivel de incertidumbre de una fuente de información, en este caso, la fuente es una imagen radiográfica. Está asociada al proceso de transformación que produce CLAHE, es decir, a mayor contraste se tiene mayor entropía. Se denota con el símbolo $H$ y se calcula según la ecuación (\ref{eq:eq1}).
+
+\begin{equation}
+   H=-\sum_{i=0}^{L-1}{p_i\times log_2(p_i)} \text{[bits]},\qquad H\in [0,log_2(L)]
+\label{eq:eq1}
+\end{equation}
+
+
+\noindent donde $p_i$ es la probabilidad de ocurrencia del $i$-ésimo nivel de gris en el histograma y $L$ es el máximo nivel de gris que puede representarse (en imágenes de 8 bits $L=256$).
+
+\subsubsection{Índice de Medida de Similitud Estructural (SSIM) \cite{Wang2004}}
+Es el coeficiente que mide el grado de distorsión en una imagen resultante B como resultado de alguna alteración a la imagen original A. Se calcula mediante la ecuación (\ref{eq:eq2}).
+
+\small{\begin{equation}
+   SSIM(B,A)=\frac{(2\mu_A\mu_B+C_1)\times (2\sigma_{AB}+C_2)}{[(\mu_A)^2+(\mu_B)^2+C_1]\times [(\sigma_A)^2 +(\sigma_B)^2+C_2]},
+\label{eq:eq2}
+\end{equation}
+
+\[
+    SSIM \in [0,1].
+\]
+}
+
+
+\noindent donde $\mu_A$ y $\mu_B$ son las intensidades promedio de las imágenes $A$ y $B$ respectivamente, $(\sigma_A)^2$ y $(\sigma_B)^2$ son las varianzas de las intensidades de las imágenes $A$ y $B$ respectivamente, $\sigma_{AB}$ es la covarianza entre las imágenes $A$ y $B$, $C_1=(k_1\times L)^2$ y $C_2=(k_2\times L)^2, (k_1\ll 1,k_2\ll 1)$  son constantes de control para evitar divisiones entre 0. Cuanto más el valor del SSIM se acerque a 1 mayor será la similitud estructural entre la imagen $B$ y la imagen $A$, es decir, la distorsión será mínima.
+
+\subsubsection{Índice de Fidelidad de la Información Visual (VIF) \cite{Sheikh2006}}
+Cuantifica la fidelidad de una imagen $B$ respecto a una referencia $A$ desde la perspectiva de la teoría de la información. Modela la referencia mediante estadísticas de escenas naturales (mezcla gaussiana a escala), el canal de distorsión como una ganancia más ruido aditivo gaussiano, y el sistema visual humano como una fuente adicional de ruido. Se define como la razón entre la información mutua que un observador puede extraer de la imagen evaluada y la que puede extraer de la referencia:
+
+\begin{equation}
+   VIF(B,A)=\frac{I(\vec{C};\vec{F}\mid s)}{I(\vec{C};\vec{E}\mid s)},
+\label{eq:eqvif}
+\end{equation}
+
+\noindent donde $\vec{C}$ representa los coeficientes de la referencia $A$, $\vec{E}$ y $\vec{F}$ las versiones percibidas de la referencia y de la imagen evaluada $B$, e $I(\cdot;\cdot)$ la información mutua. En este trabajo se emplea la versión multiescala en el dominio de píxeles (VIFP). Una propiedad distintiva del VIF es que puede superar el valor 1 cuando la imagen evaluada contiene más información visual perceptible que la referencia, comportamiento característico de un realce de contraste efectivo: el índice no penaliza el realce en sí, sino la pérdida de información.
+
+\subsection{Optimización multiobjetivo}
+
+En un problema de optimización se tratará de encontrar una solución que represente el valor óptimo en la evaluación de calidad (\textit{fitness}) de una función objetivo $f$. En ciencias e ingeniería se dan, en bastantes ocasiones, problemas que requieren la optimización simultánea de más de un objetivo, pudiendo ser directa o inversamente proporcionales entre sí. Habrá que optimizar por tanto una función cuyo problema está en que normalmente no existe un elemento que produzca un óptimo de forma simultánea para cada uno de los objetivos que componen $f$. Esto se debe a la existencia de conflictos entre objetivos, que hacen que la mejora de uno de ellos dé lugar a un empeoramiento de algún otro. Habrá que llegar por tanto a una situación de compromiso en la que todos los objetivos sean satisfechos en un grado aceptable, desde el punto de vista del diseño del problema.\par
+A diferencia de los problemas de optimización con un único objetivo, el concepto de óptimo es relativo y es necesario decidir de alguna forma cuál es la mejor solución (o cuáles son las mejores soluciones) al problema. Una forma de abordar el problema mencionado es a través de la construcción de un Frente de Pareto que contenga las soluciones consideradas óptimas para el problema.\par
+Las funciones objetivo para este trabajo son las tres medidas de calidad de la imagen radiográfica mencionadas anteriormente: entropía, SSIM y VIF. La optimización de dichas funciones consiste en maximizar el nivel de detalle y la información visual de la imagen sin distorsionar significativamente su estructura.
+
+
+\subsubsection{PSO \cite{Kennedy1995}}
+La Optimización por Enjambre de Partículas (PSO, por sus siglas en inglés) es una metaheurística que evoca el comportamiento de los enjambres en la naturaleza. Se atribuyen originalmente a los investigadores Kennedy, Eberhart y Shi. PSO permite optimizar un problema a partir de una población (enjambre) de soluciones candidatas, denotadas como "partículas", moviendo éstas por todo el espacio de búsqueda según reglas matemáticas que tienen en cuenta la posición y la velocidad de las mismas.\par
+Se denomina partícula a una solución candidata, representada por una terna de parámetros y cuya calidad es evaluada por una o más funciones objetivo. En el proceso de optimización, cada partícula tiene una posición óptima local, que corresponde a la mejor solución encontrada durante la trayectoria en el espacio de búsqueda. De manera colectiva, existe una posición óptima global, definida como la mejor entre todas las posiciones óptimas locales registradas. Esta posición  global representa la solución más prometedora dentro del enjambre y es utilizada como referencia para guiar la exploración del espacio de búsqueda en iteraciones sucesivas. Todas las posiciones óptimas pueden ser actualizadas en cada iteración del PSO. El movimiento de cada partícula se ve influido por su posición óptima local, así como por la posición óptima global, hallada hasta el momento respectivamente. El fundamento teórico del movimiento de partículas es guiar al enjambre de partículas hacia la convergencia de las mejores soluciones posibles.\par
+Una partícula generalmente se representa por el vector $\vec{x}$ y su velocidad por el vector $\vec{v}$. Lo que determina que una partícula sea mejor que otra es la dominancia. En problemas multiobjetivo, no siempre existe una única mejor solución, por lo que la dominancia está regida por dos premisas; a este tipo de dominancia se lo conoce como \textit{dominancia de Pareto}. Se dice que una partícula $\vec{x}_a$ domina a otra partícula $\vec{x}_b$ cuando:
+\begin{itemize}
+    \item La evaluación de calidad de todas las funciones objetivo es mejor o igual en $\vec{x}_a$ que en $\vec{x}_b$ y,
+    \item la evaluación de calidad en por lo menos una función objetivo, es estrictamente mejor en $\vec{x}_a$ que en $\vec{x}_b$.
+\end{itemize}
+Esto  se expresa como $\vec{x}_a\succ \vec{x}_b$ sí y solo sí:
+
+\begin{equation}
+    \begin{cases}
+        f_i(I,\vec{x}_a)\geq f_i(I,\vec{x}_b)\quad\forall i\\
+        f_i(I,\vec{x}_a)>f_i(I,\vec{x}_b)\quad\exists i
+    \end{cases},
+\label{eq:eq3}
+\end{equation}
+
+
+\noindent donde $f$ representa a la función objetivo (para esta aplicación: entropía, SSIM o VIF) e $I$ el dato de entrada en el cual se evalúa la función objetivo. De acuerdo con el concepto anterior, si la imagen mejorada aplicando el sub-algoritmo con los componentes de la partícula actual obtiene una mejor evaluación en las métricas consideradas que la imagen mejorada aplicando el sub-algoritmo con los componentes de la partícula anterior, entonces se considera a la partícula actual como solución potencial. La dominancia se aplica tanto a una misma partícula en sus diferentes estados de posición como a partículas distintas entre sí, para determinar las posiciones óptimas locales y globales, respectivamente. Cuando entre dos o más partículas, ninguna tiene dominancia sobre la otra, se dice que son soluciones no dominadas.\par
+Uno de los parámetros de entrada especificados por el usuario es $\Omega$, el cual indica cuántas partículas se generan en todo el proceso de optimización. En cada iteración, las partículas se moverán, guiadas por una partícula líder (que tiene posición óptima global) y un subconjunto de $\Omega$ serán soluciones no dominadas. Las soluciones no dominadas, naturalmente, generan una curva de óptimos en el espacio de búsqueda, al cual se lo conoce como \textit{Frente de Pareto} y cuyos ejes representan la evaluación de las funciones objetivo para estas soluciones no dominadas. Se debe iterar el algoritmo $t_{m\acute{a}x}$ veces, siendo este parámetro también especificado por el usuario. El total de las partículas que pertenecen al Frente de Pareto estará en el rango $[1,\Omega \times t_{m\acute{a}x}]$.
+
+
+\subsubsection{Frente de Pareto}
+Dado un universo de alternativas en un problema de optimización multiobjetivo, se busca determinar el conjunto que cumpla con la optimización de las funciones objetivo. En síntesis, se buscan aquellas alternativas que satisfacen la condición de obtener una evaluación de mejor calidad en un objetivo sin empeorar algún otro. Ese conjunto de alternativas óptimas establece un “Frente de Pareto”. El estudio de las soluciones en el Frente permite a los diseñadores analizar las posibles alternativas dentro de los parámetros establecidos, sin tener que analizar la totalidad de posibles soluciones. Se dice que una solución $S_1$ pertenece al Frente cuando no existe otra solución $S_2$ tal que mejore en un objetivo sin empeorar al menos uno de los otros.
+
+\subsubsection{SMPSO-CLAHE \cite{Nebro2009}}
+La Optimización Multiobjetivo por Enjambre de Partículas con Restricción de Velocidad (SMPSO, por sus siglas en inglés) es una variante multiobjetivo del PSO en donde se limita la velocidad de movimiento de las partículas para evitar que se desplacen demasiado rápido en el espacio de búsqueda, lo que podría hacer que se salgan del dominio factible o que pierdan precisión en la exploración del Frente de Pareto. Para esta aplicación, el sub-algoritmo que utiliza las partículas para producir evaluaciones de las mismas es el método CLAHE.\par
+Dada una imagen radiográfica $I$, una partícula se representa por el vector $\vec{x}=(\mathcal{R}_x,\mathcal{R}_y,\mathcal{C})$ cuyos componentes para esta aplicación son los parámetros de entrada del método CLAHE. El movimiento de una partícula en el espacio de búsqueda está dado por:
+\begin{equation}
+    \vec{x}_i=\vec{x}_{i-1}+\vec{v}_i,
+\label{eq:eq4}
+\end{equation}
+\par
+\noindent donde $i$ es la partícula actual y $\vec{v}$  es la velocidad de la partícula expresado como:
+
+\begin{equation}
+    \vec{v}_i^{k} = \chi \left[ \omega \times \vec{v}_i^{k-1} + c_1 \times r_1 \times (\vec{x}_{p_i}^{\text{óptima}} - \vec{x}_i^{k-1}) + c_2 \times r_2 \times (\vec{x}_l^{\text{líder}} - \vec{x}_i^{k-1}) \right],
+\label{eq:eq5}
+\end{equation}
+
+\noindent donde $\omega = 0.1$ es el peso inercial de la partícula, $c_1, c_2 \sim U(1.5, 2.5)$ son los coeficientes cognitivo y social, $r_1, r_2 \sim U(0,1)$ son números aleatorios, $\vec{x}_{p_i}$ es la mejor posición personal conocida y $\vec{x}_l$ es una partícula líder seleccionada del archivo de soluciones no dominadas mediante torneo binario basado en la distancia de apiñamiento \cite{Deb2002}. El factor $\chi$ es el coeficiente de constricción de Clerc y Kennedy \cite{Clerc2002}:
+
+\begin{equation}
+    \chi = \frac{2}{2-\rho-\sqrt{\rho^2-4\rho}}, \qquad
+    \rho = \begin{cases} c_1+c_2 & \text{si } c_1+c_2>4\\ 4 & \text{si } c_1+c_2\leq 4 \end{cases},
+\label{eq:eqchi}
+\end{equation}
+
+\noindent con $\chi=1$ cuando $c_1+c_2\leq 4$. Los valores de $\omega$, $c_1$ y $c_2$ corresponden a la configuración canónica del algoritmo, cuya justificación empírica proviene del estudio original \cite{Nebro2009}. La restricción de velocidad de una partícula que hace que este algoritmo difiera de otras variantes multiobjetivo del PSO está dada por:
+
+\begin{equation}
+    \vec{v}_i=
+    \begin{cases}
+        \overrightarrow{delta},\qquad &\text{si } \vec{v}_i>\overrightarrow{delta}\\
+        -\overrightarrow{delta},\qquad &\text{si } \vec{v}_i<\overrightarrow{delta}\\
+        \vec{v}_i,\qquad &\text{en otros casos}
+    \end{cases},
+\label{eq:eq6}
+\end{equation}
+
+\begin{equation*}
+    \overrightarrow{delta}=\left(\frac{R_{x_{m\acute{a}x}}-R_{x_{min}}}{2},\frac{R_{y_{m\acute{a}x}}-R_{y_{min}}}{2},\frac{C_{m\acute{a}x}-C_{min}}{2}\right),
+\end{equation*}
+
+\noindent donde $\overrightarrow{delta}$ representa los valores medios para cada parámetro de configuración del CLAHE.\par
+
+El Pseudocódigo (\ref{ps:ps1}) expone el pseudocódigo para el proceso de SMPSO-CLAHE.
+
+
+\begin{algorithm}
+\caption{SMPSO-CLAHE}
+\label{ps:ps1}
+\begin{algorithmic}[1]
+\State \textbf{Entrada:} Imagen radiográfica $I$, cantidad de partículas $\Omega$, iteraciones máximas $t_{\max}$, tamaño del archivo $A_{\max}$
+\State Inicializar archivo externo $\mathcal{A} \gets \emptyset$
+\For{$i = 1$ to $\Omega$}
+    \State Inicializar posición $\vec{x}_i \sim U(b_0, b_\infty)$, con $b_0$ y $b_\infty$ los límites del espacio de búsqueda; velocidad $\vec{v}_i \gets \vec{0}$
+    \State $T = \text{CLAHE}(I, \vec{x}_i)$
+    \State $\vec{f}(I,\vec{x}_i) = \left( H(T),\ \text{SSIM}(T, I),\ \text{VIF}(T, I) \right)$ \Comment{Ecs. (\ref{eq:eq1}), (\ref{eq:eq2}), (\ref{eq:eqvif})}
+    \State $\vec{x}_{p_i} \gets \vec{x}_i$; agregar $\vec{x}_i$ a $\mathcal{A}$ si es no dominada \Comment{Ec. (\ref{eq:eq3})}
+\EndFor
+\For{$t = 1$ to $t_{\max}$}
+    \For{$i = 1$ to $\Omega$}
+        \State Seleccionar líder $\vec{x}_l \in \mathcal{A}$ por torneo binario según distancia de apiñamiento
+        \State Muestrear $c_1, c_2 \sim U(1.5, 2.5)$; $r_1, r_2 \sim U(0,1)$
+        \State Calcular velocidad $\vec{v}_i$ con constricción y restricción \Comment{Ecs. (\ref{eq:eq5}), (\ref{eq:eqchi}), (\ref{eq:eq6})}
+        \State Actualizar posición $\vec{x}_i$ con rebote en los límites \Comment{Ec. (\ref{eq:eq4})}
+        \State Aplicar mutación polinomial al 15\% del enjambre
+        \State $T = \text{CLAHE}(I, \vec{x}_i)$
+        \State $\vec{f}(I,\vec{x}_i) = \left( H(T),\ \text{SSIM}(T, I),\ \text{VIF}(T, I) \right)$
+        \If{$\vec{x}_{p_i} \nsucc \vec{x}_i$} \Comment{Ec. (\ref{eq:eq3})}
+            \State $\vec{x}_{p_i} \gets \vec{x}_i$
+        \EndIf
+        \State Agregar $\vec{x}_i$ a $\mathcal{A}$ si es no dominada; si $|\mathcal{A}| > A_{\max}$, podar por distancia de apiñamiento
+    \EndFor
+\EndFor
+\State \textbf{Salida:} $\mathcal{A}$ (aproximación del Frente de Pareto)
+\end{algorithmic}
+\end{algorithm}
+
+\section{Métodos de selección multicriterio para el Frente de Pareto}
+Para seleccionar una solución que aporte la mayor información significativa y sea de máxima utilidad para el profesional médico se utilizan métodos de decisión con enfoque multicriterio. Los métodos de decisión toman como entrada una matriz de decisión (DM) de $m$ alternativas y $n$ criterios (orden $m\times n$). Las alternativas a elegir están dispuestas en filas. Los criterios que se toman en cuenta para las alternativas se disponen en forma de columnas. Para esta aplicación una fila en la matriz de decisión representa una solución del Frente de Pareto y cada columna representa las funciones objetivo que se evalúan para cada solución. En los posteriores ejemplos el conjunto de todas las alternativas se denota como: $X$ y un elemento de este conjunto como: $x_j$. Análogamente, el conjunto de todos los criterios se denota como: $C$ y un elemento de este conjunto como: $c_i$. La composición de la DM se puede ver en la ecuación (\ref{eq:eq7}).
+\begin{equation}
+\label{eq:eq7}
+DM =
+\begin{bmatrix}
+$x_1c_1$ & $x_1c_2$ & $x_1c_3$ & ... & $x_1c_n$\\
+$x_2c_1$ & $x_2c_2$ & $x_2c_3$ & ... & $x_2c_n$\\
+$x_3c_1$ & $x_3c_2$ & $x_3c_3$ & ... & $x_3c_n$\\
+... & ... & ... & ... & ...\\
+$x_mc_1$ & $x_mc_2$ & $x_mc_3$ & ... & $x_mc_n$\\
+\end{bmatrix},
+$x_jc_i = f(I, \overrightarrow{x_J})$,  $\overrightarrow{x_J}$ \in Frente de Pareto,
+\end{equation}
+
+\noindent Para que los componentes $x_jc_i$ de la DM estén en el mismo rango y representen la escala lo más exactamente posible, se usan procesos de normalización. En general, los métodos de decisión dejan el tipo de normalización a elección del usuario, pero algunos métodos exigen un tipo específico de normalización como parte del proceso. Se denota como: $r_{ji}=norm(x_jc_i)$ a la tupla alternativa-criterio normalizada en la DM. Algunos métodos utilizan a menudo ciertos valores etiquetados como especiales, porque representan un extremo u otro en la escala de valores del criterio, estos valores especiales se denotan como: $r_i^+$ y $r_i^-$, los mismos representan el valor positivo-ideal (mejor valor) y valor negativo-ideal (peor valor) para el criterio $c_i$ respectivamente. Asimismo, un criterio que representa un beneficio se denota como: $c^+$ y un criterio que representa un costo se denota como: $c^-$.\par
+Un método de decisión puede procesar la información teniendo en cuenta uno o más criterios establecidos por el usuario. En este contexto, un criterio es considerado como una métrica visual de la radiografía (entropía, SSIM o VIF), y los tres criterios son de tipo beneficio. Mayormente, se ponderan los criterios para establecer preferencias entre estos. Cuando no es posible elicitar pesos exactos del decisor, se emplean aproximaciones sustitutas derivadas del orden de importancia de los criterios \cite{Roberts2002}, como los pesos ROC (\textit{Rank Order Centroid}), definidos para $n$ criterios como $w_j=\frac{1}{n}\sum_{k=j}^{n}\frac{1}{k}$. De acuerdo con un algoritmo propio de cada método se selecciona una de las alternativas, teniendo en cuenta los pesos asignados a cada criterio.\par
+La salida de un método de decisión es una única alternativa, en este caso una solución del Frente de Pareto. Esta salida es considerada como la mejor alternativa según los criterios tenidos en cuenta.\par
+
+Se evalúan ocho métodos de decisión representativos de distintas familias:
+
+\begin{itemize}
+    \item \textbf{SMARTER} \cite{Edwards1994}: utilidad aditiva con pesos ROC derivados automáticamente del orden de importancia de los criterios.
+    \item \textbf{TOPSIS} \cite{Hwang1981}: selecciona la alternativa más cercana a la solución ideal positiva y más lejana de la negativa, con normalización vectorial.
+    \item \textbf{Bellman-Zadeh} \cite{Bellman1970}: decisión en ambiente difuso; la alternativa elegida maximiza el mínimo grado de pertenencia entre criterios (criterio maximin).
+    \item \textbf{PROMETHEE II} \cite{Brans1985}: ranking completo por flujos netos de preferencia calculados sobre comparaciones por pares.
+    \item \textbf{GRA} \cite{Deng1989}: grado de relación gris de cada alternativa con la secuencia de referencia ideal.
+    \item \textbf{VIKOR} \cite{Opricovic2004}: solución de compromiso que combina la utilidad grupal y el arrepentimiento individual máximo.
+    \item \textbf{CODAS} \cite{KeshavarzGhorabaee2016}: evaluación por distancia euclidiana a la solución ideal negativa, con la distancia taxicab como desempate.
+    \item \textbf{MABAC} \cite{Pamucar2015}: distancia de cada alternativa al área de aproximación de borde definida por la media geométrica.
+\end{itemize}
+
+Cada método aplica su técnica de normalización canónica, puesto que la normalización es parte integral de la definición de cada método. Adicionalmente, se calcula la solución de \textbf{consenso}, definida como la alternativa seleccionada por la mayor cantidad de métodos; la frecuencia con que cada método coincide con el consenso permite identificar al método más representativo del comportamiento colectivo.
+
+\section{Experimentos y Resultados}
+\label{sec:experimentos}
+
+% NOTA: los valores TODO se completan con las salidas del experimento
+% (results/experiment_*/tables y figures, generadas por
+%  scripts/generate_experiment_figures.py).
+
+\subsection{Diseño experimental}
+Se utiliza la base de datos pública \textit{Panoramic radiography database} \cite{Fretes2021}, compuesta por 598 ortopantomografías digitales en escala de grises de $2041\times 1024$ píxeles, adquiridas en la Facultad de Odontología de la Universidad Nacional de Asunción \cite{MelloRoman2021}. De la población se extrae una muestra aleatoria estratificada de 83 imágenes, tamaño determinado mediante la fórmula de Cochran para poblaciones finitas con un nivel de confianza del 95\% y un margen de error del $\pm 10\%$ \cite{Cochran1977}. Para disponer de una referencia objetiva de calidad, cada imagen original se somete a una degradación de contraste controlada (bajo contraste global, subexposición, sobreexposición, bajo contraste local o histograma sesgado, con tipo y parámetros aleatorios por imagen), y la imagen degradada actúa como entrada del framework. Esto permite medir la recuperación de calidad de la salida respecto a la imagen original (\textit{ground truth}), mediante las métricas con referencia SSIM y VIF.\par
+La configuración de SMPSO es la canónica \cite{Nebro2009}: 100 partículas, 100 iteraciones, archivo externo de tamaño 100, $c_1,c_2\sim U(1.5,2.5)$, $\omega=0.1$, mutación polinomial con índice de distribución 20 aplicada al 15\% del enjambre. El espacio de búsqueda es $\mathcal{R}_x,\mathcal{R}_y\in[2,64]$ (enteros) y $\mathcal{C}\in[1.0,4.0]$.
+
+\subsection{Resultados de la optimización}
+SMPSO pobló el archivo externo hasta su capacidad máxima ($100.0\pm 0.1$ soluciones no dominadas) en todas las imágenes, con un costo de $24.2\pm 3.9$ minutos por imagen (10\,000 evaluaciones de la función objetivo). Las soluciones seleccionadas por consenso alcanzaron una entropía media de $7.15\pm 1.21$ bits, un SSIM de $0.784\pm 0.161$ y un VIF de $1.188\pm 0.262$ respecto a la imagen de entrada. Que el VIF medio supere la unidad indica que el realce \textit{agrega} información visual perceptible en lugar de limitarse a preservarla, comportamiento que ninguna métrica acotada en $[0,1]$ como el SSIM puede expresar. Los parámetros óptimos se concentran en regiones contextuales pequeñas ($R_x=4.9\pm 5.1$, $R_y=3.7\pm 3.2$, moda $2$), coherente con el carácter global de las degradaciones aplicadas, mientras que el límite de recorte se distribuye en todo su dominio ($C=2.06\pm 1.11$), reflejando la dependencia del realce con la severidad de cada degradación.
+
+\subsection{Validación contra la imagen original}
+La totalidad de las 83 imágenes (100\%) recuperó fidelidad de información visual respecto a la imagen original, con una ganancia media de VIF de $+0.268$ (de $0.682$ a $0.950$), estadísticamente significativa según la prueba de rangos con signo de Wilcoxon ($W=0$, $p<10^{-14}$); el valor $W=0$ indica que no hubo una sola imagen en que el realce empeorara el VIF. En cuanto a la similitud estructural, 68 de 83 imágenes (81.9\%) mejoraron su SSIM respecto a la original ($+0.073$, $W=391$, $p<10^{-9}$). La menor tasa de mejora del SSIM es consistente con su definición: penaliza toda alteración estructural, incluso la que restituye contraste diagnóstico.
+
+La recuperación depende marcadamente del tipo de degradación: bajo contraste global ($+0.497\pm 0.078$ de VIF), histograma sesgado ($+0.227\pm 0.106$), sobreexposición ($+0.178\pm 0.058$), subexposición ($+0.165\pm 0.077$) y bajo contraste local ($+0.128\pm 0.032$). CLAHE redistribuye el histograma, por lo que recupera el rango dinámico comprimido pero no el detalle espacial destruido por suavizado.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{recuperacion_vif.pdf}
+    \caption{VIF de la imagen mejorada frente al de la imagen degradada, ambos medidos contra la imagen original. Todos los puntos se ubican sobre la diagonal (sin cambio), evidenciando recuperación de información visual en las 83 imágenes.}
+    \Description{Dispersión de VIF mejorada vs degradada por tipo de degradación.}
+    \label{fig:recuperacion}
+\end{figure}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.92\textwidth]{trio_low_contrast.pdf}
+    \caption{Ejemplo representativo: imagen original, imagen degradada con bajo contraste global (entrada del framework) e imagen mejorada seleccionada por consenso (salida). Se indican SSIM y VIF respecto a la original.}
+    \Description{Tres radiografías panorámicas: original, degradada y mejorada.}
+    \label{fig:trio}
+\end{figure*}
+
+\subsection{Concordancia entre métodos de decisión}
+El acuerdo exacto medio entre pares de métodos fue del 17.3\%. Aunque bajo en términos absolutos, supera en más de un orden de magnitud el 1\% esperable por azar sobre frentes de 100 alternativas. La solución de consenso reunió en promedio $3.22$ de los ocho votos.
+
+Un hallazgo relevante es que SMARTER y MABAC coinciden en el 100\% de las imágenes. Esta coincidencia no es un artefacto experimental sino una propiedad algebraica: bajo criterios de beneficio y normalización lineal max-min, la puntuación de MABAC satisface
+
+\begin{equation}
+    S_i = \sum_{j=1}^{n}\left(w_j(r_{ij}+1)-g_j\right) = \sum_{j=1}^{n} w_j r_{ij} + \underbrace{\sum_{j=1}^{n}(w_j-g_j)}_{\text{constante}},
+\label{eq:equivalencia}
+\end{equation}
+
+\noindent es decir, difiere de la utilidad aditiva de SMARTER en una constante aditiva, por lo que ambos métodos inducen el mismo ordenamiento de las alternativas cuando emplean el mismo vector de pesos. La verificación numérica confirma una correlación de Spearman de exactamente $1.00$ entre sus rankings. Esto implica que la inclusión de ambos métodos en un esquema de consenso introduce un sesgo, al garantizarles un piso de dos votos coincidentes; se trata de una advertencia metodológica para trabajos que combinen métodos MCDM sin analizar su independencia.
+
+Descontado ese efecto, SMARTER (utilidad aditiva con pesos ROC) y GRA (análisis relacional gris) resultan los métodos más representativos del comportamiento colectivo, con coincidencias del 90.4\% y 45.8\% con el consenso respectivamente. En el extremo opuesto, Bellman-Zadeh coincide con el consenso en apenas el 4.8\% de los casos: su criterio maximin no compensatorio privilegia soluciones equilibradas del centro del frente, mientras que los métodos compensatorios favorecen las que destacan en el criterio de mayor peso.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{acuerdo_mcdm.pdf}
+    \caption{Matriz de acuerdo entre los ocho métodos MCDM: porcentaje de imágenes en que cada par seleccionó la misma solución del Frente de Pareto.}
+    \Description{Mapa de calor del acuerdo entre métodos de decisión.}
+    \label{fig:acuerdo}
+\end{figure}
+
+\subsection{Sensibilidad de los pesos}
+Dado que los pesos se derivan del orden de importancia y no de una elicitación con expertos, se recomputó la etapa de decisión sobre los mismos frentes con cuatro esquemas de ponderación. Preservado el orden VIF $>$ H $>$ SSIM, el cambio de ROC a \textit{Rank Sum} altera el consenso en apenas el 12\% de las imágenes; en cambio, con pesos iguales el consenso coincide en el 67.5\% de los casos y con un esquema que privilegia la entropía, solo en el 57.8\%. La decisión crítica es, por tanto, el orden de importancia de los criterios y no el valor numérico exacto de los pesos, lo que respalda el uso de pesos ROC en ausencia de elicitación directa \cite{Roberts2002}.
+
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+Se presentó un framework de procesamiento por etapas que automatiza la mejora de contraste y la selección de imágenes radiográficas, integrando CLAHE, la optimización multiobjetivo mediante SMPSO con tres funciones objetivo (entropía, SSIM y VIF) y la decisión multicriterio a posteriori mediante ocho métodos MCDM.
+
+La evaluación sobre una muestra representativa de 83 ortopantomografías sometidas a degradaciones controladas mostró que las 83 imágenes recuperaron fidelidad de información visual respecto a la imagen original ($p<10^{-14}$) y el 81.9\% recuperó además similitud estructural. La incorporación del VIF como tercera función objetivo resultó determinante: al no estar acotado superiormente, captura la ganancia de información visual que produce un realce efectivo, algo que el SSIM, maximizado por la ausencia de modificación, no puede expresar.
+
+Respecto a la etapa de decisión, se demostró la equivalencia ordinal entre SMARTER y MABAC bajo criterios de beneficio y normalización max-min, con sus consecuencias para el diseño de esquemas de consenso, y se identificó a SMARTER y GRA como los métodos más representativos del juicio agregado del conjunto. Esta representatividad es interna al conjunto de métodos evaluados y no equivale a utilidad diagnóstica percibida.
+
+Como trabajo futuro se plantea la validación perceptual con profesionales odontólogos, que permitiría contrastar las selecciones de los métodos con el juicio clínico y determinar cuál de ellos elige la imagen de mayor utilidad diagnóstica; la elicitación directa de los pesos de los criterios con expertos; la extensión a otras modalidades radiográficas; y la reducción del costo computacional mediante modelos subrogados o inicialización informada del enjambre, hoy la principal limitación para un uso interactivo.
+
+\begin{acks}
+% TODO: agradecimientos (tutor, institución).
+\end{acks}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{citations}
+
+\end{document}

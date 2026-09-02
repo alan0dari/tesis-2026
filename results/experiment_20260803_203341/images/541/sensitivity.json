@@ -1,0 +1,70 @@
+{
+  "roc": {
+    "consensus": {
+      "index": 33,
+      "votes": 3,
+      "total_methods": 8
+    },
+    "selections": {
+      "SMARTER": 33,
+      "TOPSIS": 66,
+      "BellmanZadeh": 28,
+      "PROMETHEEII": 53,
+      "GRA": 33,
+      "VIKOR": 69,
+      "CODAS": 48,
+      "MABAC": 33
+    }
+  },
+  "rs": {
+    "consensus": {
+      "index": 33,
+      "votes": 2,
+      "total_methods": 8
+    },
+    "selections": {
+      "SMARTER": 33,
+      "TOPSIS": 93,
+      "BellmanZadeh": 28,
+      "PROMETHEEII": 7,
+      "GRA": 33,
+      "VIKOR": 69,
+      "CODAS": 48,
+      "MABAC": 32
+    }
+  },
+  "equal": {
+    "consensus": {
+      "index": 94,
+      "votes": 2,
+      "total_methods": 8
+    },
+    "selections": {
+      "SMARTER": 33,
+      "TOPSIS": 94,
+      "BellmanZadeh": 28,
+      "PROMETHEEII": 30,
+      "GRA": 48,
+      "VIKOR": 32,
+      "CODAS": 94,
+      "MABAC": 32
+    }
+  },
+  "legacy": {
+    "consensus": {
+      "index": 32,
+      "votes": 2,
+      "total_methods": 8
+    },
+    "selections": {
+      "SMARTER": 33,
+      "TOPSIS": 45,
+      "BellmanZadeh": 28,
+      "PROMETHEEII": 30,
+      "GRA": 48,
+      "VIKOR": 32,
+      "CODAS": 63,
+      "MABAC": 32
+    }
+  }
+}

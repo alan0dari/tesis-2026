@@ -259,32 +259,44 @@ def apply_degradation(
 
 def apply_random_degradation(
     image: NDArray[np.uint8],
-    seed: Optional[int] = None
+    seed: Optional[int] = None,
+    force_type: Optional[Union[DegradationType, str]] = None
 ) -> Tuple[NDArray[np.uint8], DegradationType, Dict]:
     """
     Aplica una degradación aleatoria a la imagen.
-    
+
     Selecciona aleatoriamente un tipo de degradación y parámetros
     dentro de rangos razonables.
-    
+
     Args:
         image: Imagen en escala de grises (uint8).
         seed: Semilla para reproducibilidad.
-    
+        force_type: Si se indica, fija el tipo de degradación y sólo sortea
+            sus parámetros. Permite repartir los tipos de forma balanceada
+            entre las imágenes de un experimento en lugar de dejarlos al azar,
+            que sobre muestras chicas desbalancea los grupos de comparación.
+
     Returns:
         Tupla con (imagen_degradada, tipo_degradacion, parametros_usados).
-    
+
     Examples:
         >>> img = cv2.imread('radiografia.png', cv2.IMREAD_GRAYSCALE)
         >>> degraded, deg_type, params = apply_random_degradation(img, seed=42)
         >>> print(f"Aplicada degradacion: {deg_type.value} con params: {params}")
+        >>> # Tipo fijo, parámetros sorteados
+        >>> degraded, _, _ = apply_random_degradation(img, seed=42,
+        ...                                           force_type='underexposure')
     """
     if seed is not None:
         np.random.seed(seed)
-    
-    # Seleccionar tipo de degradación aleatoriamente
-    deg_type = np.random.choice(list(DegradationType))
-    
+
+    if force_type is not None:
+        deg_type = (DegradationType(force_type) if isinstance(force_type, str)
+                    else force_type)
+    else:
+        # Seleccionar tipo de degradación aleatoriamente
+        deg_type = np.random.choice(list(DegradationType))
+
     # Definir rangos de parámetros para cada tipo
     if deg_type == DegradationType.LOW_CONTRAST:
         params = {'factor': np.random.uniform(0.3, 0.6)}

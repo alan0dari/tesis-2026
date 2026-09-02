@@ -393,96 +393,108 @@ def build_pareto_front(
 
 def calculate_hypervolume(
     pareto_front: List[Dict],
-    reference_point: NDArray[np.float64]
+    reference_point: NDArray[np.float64],
+    maximize: bool = True
 ) -> float:
     """
-    Calcula el hipervolumen del Frente de Pareto.
-    
-    El hipervolumen es una métrica de calidad que mide el volumen del
-    espacio objetivo dominado por el Frente de Pareto.
-    
+    Calcula el hipervolumen exacto del Frente de Pareto (2 o 3 objetivos).
+
+    El hipervolumen mide el volumen del espacio objetivo dominado por el
+    frente respecto a un punto de referencia. Es la métrica estándar de
+    calidad conjunta de convergencia y diversidad en optimización
+    multiobjetivo.
+
     Args:
-        pareto_front: Lista de soluciones del Frente de Pareto.
-        reference_point: Punto de referencia (típicamente el peor valor posible).
-    
+        pareto_front: Lista de soluciones del Frente de Pareto
+                      (diccionarios con clave 'objectives').
+        reference_point: Punto de referencia. Para maximización debe estar
+                         dominado por todas las soluciones (peor que todas);
+                         para minimización, dominado en sentido inverso.
+        maximize: Si True (por defecto), los objetivos se maximizan.
+
     Returns:
-        Valor del hipervolumen.
-    
-    Note:
-        Implementación simplificada para 2D y 3D. Para dimensiones mayores,
-        considerar usar bibliotecas especializadas.
-    
+        Valor exacto del hipervolumen (área en 2D, volumen en 3D).
+
     Examples:
         >>> pareto = [
         ...     {'objectives': np.array([1.0, 5.0])},
         ...     {'objectives': np.array([2.0, 3.0])},
         ...     {'objectives': np.array([3.0, 1.0])},
         ... ]
-        >>> ref_point = np.array([10.0, 10.0])
-        >>> hv = calculate_hypervolume(pareto, ref_point)
+        >>> hv = calculate_hypervolume(pareto, np.array([0.0, 0.0]))
     """
     if not pareto_front:
         return 0.0
-    
-    n_objectives = len(pareto_front[0]['objectives'])
-    
+
+    points = np.array([s['objectives'] for s in pareto_front], dtype=np.float64)
+    ref = np.asarray(reference_point, dtype=np.float64)
+
+    # Convertir todo a maximización con referencia por debajo
+    if not maximize:
+        points = -points
+        ref = -ref
+
+    # Descartar puntos que no dominan al punto de referencia
+    points = points[np.all(points > ref, axis=1)]
+    if len(points) == 0:
+        return 0.0
+
+    n_objectives = points.shape[1]
     if n_objectives == 2:
-        return _hypervolume_2d(pareto_front, reference_point)
+        return _hypervolume_2d_max(points, ref)
     elif n_objectives == 3:
-        return _hypervolume_3d(pareto_front, reference_point)
+        return _hypervolume_3d_max(points, ref)
     else:
         raise NotImplementedError(
             f"Cálculo de hipervolumen no implementado para {n_objectives} objetivos"
         )
 
 
-def _hypervolume_2d(
-    pareto_front: List[Dict],
-    reference_point: NDArray[np.float64]
+def _hypervolume_2d_max(
+    points: NDArray[np.float64],
+    ref: NDArray[np.float64]
 ) -> float:
-    """Calcula hipervolumen para 2 objetivos."""
-    # Ordenar por primer objetivo
-    sorted_front = sorted(pareto_front, key=lambda x: x['objectives'][0])
-    
-    hypervolume = 0.0
-    prev_x = 0.0
-    
-    for solution in sorted_front:
-        x, y = solution['objectives']
-        
-        if x >= reference_point[0] or y >= reference_point[1]:
-            continue
-        
-        width = x - prev_x
-        height = reference_point[1] - y
-        
-        hypervolume += width * height
-        prev_x = x
-    
-    return hypervolume
+    """
+    Hipervolumen exacto 2D (maximización): área de la unión de rectángulos
+    [ref_x, x_i] x [ref_y, y_i], calculada por barrido en franjas
+    horizontales sobre los puntos ordenados por x descendente.
+    """
+    order = np.argsort(-points[:, 0])
+    hv = 0.0
+    y_cubierto = ref[1]
+    for x, y in points[order]:
+        if y > y_cubierto:
+            hv += (x - ref[0]) * (y - y_cubierto)
+            y_cubierto = y
+    return float(hv)
 
 
-def _hypervolume_3d(
-    pareto_front: List[Dict],
-    reference_point: NDArray[np.float64]
+def _hypervolume_3d_max(
+    points: NDArray[np.float64],
+    ref: NDArray[np.float64]
 ) -> float:
-    """Calcula hipervolumen aproximado para 3 objetivos."""
-    # Implementación simplificada usando suma de cuboides
-    hypervolume = 0.0
-    
-    for solution in pareto_front:
-        obj = solution['objectives']
-        
-        if np.any(obj >= reference_point):
+    """
+    Hipervolumen exacto 3D (maximización) por barrido dimensional:
+    se procesan los puntos por su tercera coordenada en orden descendente
+    y se integra, para cada franja de altura entre niveles consecutivos de
+    z, el área 2D (hipervolumen 2D) de los puntos ya procesados.
+    """
+    # Ordenar por z descendente
+    order = np.argsort(-points[:, 2])
+    pts = points[order]
+    z_values = pts[:, 2]
+
+    hv = 0.0
+    for k in range(len(pts)):
+        # Franja entre z_k y el siguiente nivel (o la referencia al final)
+        z_top = z_values[k]
+        z_bottom = z_values[k + 1] if k + 1 < len(pts) else ref[2]
+        if z_top <= z_bottom:
             continue
-        
-        # Volumen del cuboide formado por la solución y el punto de referencia
-        volume = np.prod(reference_point - obj)
-        hypervolume += volume
-    
-    # Nota: Esta es una aproximación que puede contar overlaps
-    # Para cálculo exacto, usar algoritmos especializados (WFG, HMS)
-    return hypervolume * 0.5  # Factor de corrección aproximado
+        # Área 2D de todos los puntos con z >= z_top
+        area = _hypervolume_2d_max(pts[:k + 1, :2], ref[:2])
+        hv += area * (z_top - z_bottom)
+    return float(hv)
 
 
 def calculate_spacing(pareto_front: List[Dict]) -> float:

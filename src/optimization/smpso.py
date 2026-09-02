@@ -20,7 +20,7 @@ from src.optimization.pareto import ParetoFront, Solution
 from src.clahe.processor import CLAHEProcessor
 from src.metrics.entropy import calculate_entropy
 from src.metrics.ssim import calculate_ssim
-from src.metrics.vqi import calculate_vqi
+from src.metrics.vif import calculate_vif
 
 
 @dataclass
@@ -50,9 +50,15 @@ class SMPSOImageOptimizer:
     que maximizan simultáneamente tres métricas de calidad de imagen:
     - Entropía: Cantidad de información/detalle en la imagen
     - SSIM: Similitud estructural con la imagen original
-    - VQI: Índice de calidad visual percibida
-    
+    - VIF: Fidelidad de información visual (Sheikh & Bovik 2006)
+
     El resultado es un Frente de Pareto 3D con soluciones óptimas.
+
+    Sigue la formulación canónica de SMPSO (Nebro et al. 2009):
+    coeficiente de constricción de Clerc-Kennedy, C1, C2 ~ U(1.5, 2.5),
+    peso de inercia w = 0.1, restricción de velocidad delta = (sup - inf)/2,
+    rebote de velocidad en los límites y mutación polinomial aplicada
+    al 15% del enjambre.
     
     Attributes:
         image: Imagen original en escala de grises.
@@ -88,11 +94,10 @@ class SMPSOImageOptimizer:
         n_particles: int = 50,
         max_iterations: int = 100,
         archive_size: int = 100,
-        c1: float = 1.5,
-        c2: float = 1.5,
-        w_max: float = 0.9,
-        w_min: float = 0.4,
-        mutation_probability: float = 0.1,
+        c1_range: Tuple[float, float] = (1.5, 2.5),
+        c2_range: Tuple[float, float] = (1.5, 2.5),
+        inertia_weight: float = 0.1,
+        mutation_rate: float = 0.15,
         mutation_distribution_index: float = 20.0,
         verbose: bool = True,
         seed: Optional[int] = None,
@@ -100,17 +105,20 @@ class SMPSOImageOptimizer:
     ):
         """
         Inicializa el optimizador SMPSO para imágenes.
-        
+
+        Los valores por defecto corresponden a la configuración canónica de
+        SMPSO (Nebro et al. 2009): C1, C2 ~ U(1.5, 2.5), w = 0.1, mutación
+        polinomial con índice de distribución 20 aplicada al 15% del enjambre.
+
         Args:
             image: Imagen en escala de grises (uint8) a optimizar.
             n_particles: Número de partículas en el enjambre.
             max_iterations: Número de iteraciones del algoritmo.
             archive_size: Tamaño máximo del Frente de Pareto.
-            c1: Coeficiente cognitivo (aprendizaje personal).
-            c2: Coeficiente social (aprendizaje del enjambre).
-            w_max: Peso de inercia máximo (inicio).
-            w_min: Peso de inercia mínimo (final).
-            mutation_probability: Probabilidad de mutación polinomial.
+            c1_range: Rango uniforme del coeficiente cognitivo.
+            c2_range: Rango uniforme del coeficiente social.
+            inertia_weight: Peso de inercia w (constante, 0.1 en SMPSO).
+            mutation_rate: Fracción del enjambre sometida a mutación polinomial.
             mutation_distribution_index: Índice de distribución para mutación.
             verbose: Si True, muestra progreso durante la optimización.
             seed: Semilla para reproducibilidad (opcional).
@@ -118,7 +126,7 @@ class SMPSOImageOptimizer:
                                      la imagen usada durante la búsqueda.
                                      None = usar imagen original (más lento).
                                      512 es un buen balance velocidad/precisión.
-        
+
         Raises:
             ValueError: Si la imagen no es válida.
         """
@@ -156,11 +164,10 @@ class SMPSOImageOptimizer:
         self.n_particles = n_particles
         self.max_iterations = max_iterations
         self.archive_size = archive_size
-        self.c1 = c1
-        self.c2 = c2
-        self.w_max = w_max
-        self.w_min = w_min
-        self.mutation_probability = mutation_probability
+        self.c1_range = c1_range
+        self.c2_range = c2_range
+        self.inertia_weight = inertia_weight
+        self.mutation_rate = mutation_rate
         self.mutation_distribution_index = mutation_distribution_index
         self.verbose = verbose
         
@@ -225,26 +232,29 @@ class SMPSOImageOptimizer:
                   f"Frente de Pareto: {len(self.pareto_front)} soluciones")
         
         # Paso 2: Bucle principal de optimización
+        # Intervalo de mutación: en SMPSO canónico se muta al 15% del
+        # enjambre (1 de cada 6 partículas, jMetal aplica i % 6 == 0)
+        mutation_interval = max(1, int(round(1.0 / self.mutation_rate))) \
+            if self.mutation_rate > 0 else 0
+
         for iteration in range(self.max_iterations):
-            # Calcular peso de inercia (decrece linealmente)
-            w = self.w_max - (self.w_max - self.w_min) * (iteration / self.max_iterations)
-            
-            for particle in self.swarm:
+            for i, particle in enumerate(self.swarm):
                 # Seleccionar líder del archivo
                 if len(self.pareto_front) > 0:
                     leader = self.pareto_front.select_leader()
                     leader_position = leader.parameters
                 else:
                     leader_position = particle.best_position
-                
-                # Actualizar velocidad con restricción
-                self._update_velocity(particle, leader_position, w)
-                
+
+                # Actualizar velocidad con constricción y restricción delta
+                self._update_velocity(particle, leader_position)
+
                 # Actualizar posición
                 self._update_position(particle)
-                
-                # Aplicar mutación polinomial
-                self._polynomial_mutation(particle)
+
+                # Mutación polinomial sobre el 15% del enjambre
+                if mutation_interval and i % mutation_interval == 0:
+                    self._polynomial_mutation(particle)
                 
                 # Evaluar función objetivo
                 particle.objectives = self._evaluate(particle.position)
@@ -261,7 +271,7 @@ class SMPSOImageOptimizer:
                 self.pareto_front.add(solution)
             
             # Guardar estadísticas de la iteración
-            self._record_iteration(iteration, w)
+            self._record_iteration(iteration)
             
             # Mostrar progreso
             if self.verbose and (iteration + 1) % 10 == 0:
@@ -324,9 +334,9 @@ class SMPSOImageOptimizer:
         
         Args:
             position: Parámetros [R_x, R_y, clip_limit].
-        
+
         Returns:
-            Array con [entropía, SSIM, VQI].
+            Array con [entropía, SSIM, VIF].
         """
         # Extraer y validar parámetros
         rx = int(round(np.clip(position[0], self.BOUNDS['rx'][0], self.BOUNDS['rx'][1])))
@@ -345,9 +355,9 @@ class SMPSOImageOptimizer:
             # Calcular métricas (todas a maximizar)
             entropy = calculate_entropy(enhanced_image)
             ssim = calculate_ssim(self.image, enhanced_image)
-            vqi = calculate_vqi(enhanced_image)
-            
-            return np.array([entropy, ssim, vqi])
+            vif = calculate_vif(self.image, enhanced_image)
+
+            return np.array([entropy, ssim, vif])
             
         except Exception as e:
             # En caso de error, retornar valores muy bajos
@@ -358,57 +368,76 @@ class SMPSOImageOptimizer:
     def _update_velocity(
         self,
         particle: Particle,
-        leader_position: NDArray[np.float64],
-        w: float
+        leader_position: NDArray[np.float64]
     ) -> None:
         """
-        Actualiza la velocidad de la partícula con restricción SMPSO.
-        
-        La ecuación de velocidad es:
-        v = w*v + c1*r1*(pbest - x) + c2*r2*(leader - x)
-        
-        Luego se aplica la restricción:
-        v = clamp(v, -delta, +delta)
-        
+        Actualiza la velocidad de la partícula según SMPSO (Nebro et al. 2009).
+
+        La ecuación de velocidad con coeficiente de constricción es:
+        v = chi * [w*v + C1*r1*(pbest - x) + C2*r2*(leader - x)]
+
+        donde chi es el coeficiente de constricción de Clerc-Kennedy:
+        chi = 2 / (2 - rho - sqrt(rho^2 - 4*rho)),  rho = C1 + C2 si C1+C2 > 4,
+        chi = 1 en caso contrario.
+
+        Luego se aplica la restricción de velocidad:
+        v = clamp(v, -delta, +delta),  delta = (sup - inf) / 2
+
         Args:
             particle: Partícula a actualizar.
             leader_position: Posición del líder seleccionado.
-            w: Peso de inercia actual.
         """
         r1 = np.random.random(3)
         r2 = np.random.random(3)
-        
+
+        # C1, C2 ~ U(1.5, 2.5) muestreados en cada actualización
+        c1 = np.random.uniform(*self.c1_range)
+        c2 = np.random.uniform(*self.c2_range)
+
+        # Coeficiente de constricción de Clerc-Kennedy
+        rho = c1 + c2
+        if rho > 4.0:
+            chi = 2.0 / (2.0 - rho - np.sqrt(rho ** 2 - 4.0 * rho))
+        else:
+            chi = 1.0
+
         # Componente cognitivo (hacia mejor posición personal)
-        cognitive = self.c1 * r1 * (particle.best_position - particle.position)
-        
+        cognitive = c1 * r1 * (particle.best_position - particle.position)
+
         # Componente social (hacia el líder)
-        social = self.c2 * r2 * (leader_position - particle.position)
-        
-        # Actualizar velocidad
-        particle.velocity = w * particle.velocity + cognitive + social
-        
+        social = c2 * r2 * (leader_position - particle.position)
+
+        # Actualizar velocidad con constricción
+        particle.velocity = chi * (
+            self.inertia_weight * particle.velocity + cognitive + social
+        )
+
         # Aplicar restricción de velocidad (característica clave de SMPSO)
         particle.velocity = np.clip(particle.velocity, -self.delta, self.delta)
     
     def _update_position(self, particle: Particle) -> None:
         """
         Actualiza la posición de la partícula y verifica límites.
-        
+
+        Siguiendo SMPSO (jMetal), al violar un límite la posición se fija en
+        el límite y la velocidad se invierte (rebote, factor -1) en lugar de
+        anularse, preservando el impulso de búsqueda.
+
         Args:
             particle: Partícula a actualizar.
         """
         # Actualizar posición
         particle.position = particle.position + particle.velocity
-        
-        # Mantener dentro de límites
+
+        # Mantener dentro de límites con rebote de velocidad
         for i in range(3):
             if particle.position[i] < self.bounds_lower[i]:
                 particle.position[i] = self.bounds_lower[i]
-                particle.velocity[i] = 0
+                particle.velocity[i] *= -1.0
             elif particle.position[i] > self.bounds_upper[i]:
                 particle.position[i] = self.bounds_upper[i]
-                particle.velocity[i] = 0
-        
+                particle.velocity[i] *= -1.0
+
         # Redondear R_x y R_y a enteros
         particle.position[0] = round(particle.position[0])
         particle.position[1] = round(particle.position[1])
@@ -416,20 +445,19 @@ class SMPSOImageOptimizer:
     def _polynomial_mutation(self, particle: Particle) -> None:
         """
         Aplica mutación polinomial para mantener diversidad.
-        
+
         La mutación polinomial es característica de SMPSO y ayuda a
-        explorar nuevas regiones del espacio de búsqueda.
-        
+        explorar nuevas regiones del espacio de búsqueda. Se invoca sobre
+        el 15% del enjambre; cada variable muta con probabilidad 1/n
+        (n = número de variables de decisión).
+
         Args:
             particle: Partícula a mutar.
         """
-        if np.random.random() > self.mutation_probability:
-            return
-        
         eta = self.mutation_distribution_index
-        
+
         for i in range(3):
-            if np.random.random() < 1.0 / 3.0:  # Probabilidad de mutar cada gen
+            if np.random.random() < 1.0 / 3.0:  # pm = 1/n variables
                 u = np.random.random()
                 
                 delta_lower = (particle.position[i] - self.bounds_lower[i]) / \
@@ -459,41 +487,39 @@ class SMPSOImageOptimizer:
     
     def _update_personal_best(self, particle: Particle) -> None:
         """
-        Actualiza la mejor posición personal si la actual la domina.
-        
+        Actualiza la mejor posición personal.
+
+        Criterio SMPSO/OMOPSO: la nueva posición reemplaza a la mejor
+        personal salvo que sea dominada por esta (si son mutuamente no
+        dominadas, se adopta la nueva).
+
         Args:
             particle: Partícula a evaluar.
         """
-        # Verificar si la posición actual domina a la mejor personal
-        current_dominates = (
-            np.all(particle.objectives >= particle.best_objectives) and
-            np.any(particle.objectives > particle.best_objectives)
+        # Maximización: pbest domina a la actual si es >= en todo y > en algo
+        pbest_dominates = (
+            np.all(particle.best_objectives >= particle.objectives) and
+            np.any(particle.best_objectives > particle.objectives)
         )
-        
-        if current_dominates:
+
+        if not pbest_dominates:
             particle.best_position = particle.position.copy()
             particle.best_objectives = particle.objectives.copy()
-        elif not np.all(particle.best_objectives >= particle.objectives):
-            # Si ninguna domina, seleccionar aleatoriamente
-            if np.random.random() < 0.5:
-                particle.best_position = particle.position.copy()
-                particle.best_objectives = particle.objectives.copy()
     
-    def _record_iteration(self, iteration: int, w: float) -> None:
+    def _record_iteration(self, iteration: int) -> None:
         """Registra estadísticas de la iteración."""
         objectives = self.pareto_front.get_decision_matrix()
-        
+
         if len(objectives) > 0:
             self.history.append({
                 'iteration': iteration,
-                'w': w,
                 'pareto_size': len(self.pareto_front),
                 'entropy_mean': np.mean(objectives[:, 0]),
                 'ssim_mean': np.mean(objectives[:, 1]),
-                'vqi_mean': np.mean(objectives[:, 2]),
+                'vif_mean': np.mean(objectives[:, 2]),
                 'entropy_max': np.max(objectives[:, 0]),
                 'ssim_max': np.max(objectives[:, 1]),
-                'vqi_max': np.max(objectives[:, 2])
+                'vif_max': np.max(objectives[:, 2])
             })
     
     def _print_progress(self, iteration: int) -> None:
@@ -504,7 +530,7 @@ class SMPSOImageOptimizer:
                   f"Pareto: {stats['pareto_size']:3d} | "
                   f"H: {stats['entropy_max']:.3f} | "
                   f"SSIM: {stats['ssim_max']:.4f} | "
-                  f"VQI: {stats['vqi_max']:.2f}")
+                  f"VIF: {stats['vif_max']:.4f}")
     
     def _print_pareto_summary(self) -> None:
         """Imprime resumen del Frente de Pareto final."""
@@ -522,9 +548,9 @@ class SMPSOImageOptimizer:
         print(f"  SSIM:      min={objectives[:, 1].min():.4f}, "
               f"max={objectives[:, 1].max():.4f}, "
               f"mean={objectives[:, 1].mean():.4f}")
-        print(f"  VQI:       min={objectives[:, 2].min():.2f}, "
-              f"max={objectives[:, 2].max():.2f}, "
-              f"mean={objectives[:, 2].mean():.2f}")
+        print(f"  VIF:       min={objectives[:, 2].min():.4f}, "
+              f"max={objectives[:, 2].max():.4f}, "
+              f"mean={objectives[:, 2].mean():.4f}")
         print(f"\nRango de parámetros:")
         print(f"  R_x:       {params[:, 0].min():.0f} - {params[:, 0].max():.0f}")
         print(f"  R_y:       {params[:, 1].min():.0f} - {params[:, 1].max():.0f}")

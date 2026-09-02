@@ -1,0 +1,45 @@
+\chapter{Conclusiones} % Título del capítulo
+\label{Chapter6}
+\lhead{Capítulo 6. \emph{Conclusiones}}
+
+\section{Conclusiones}
+
+Este trabajo presentó un framework de procesamiento por etapas para la mejora de contraste y selección automática de imágenes radiográficas, integrando la transformación CLAHE, la optimización multiobjetivo mediante SMPSO y la decisión multicriterio a posteriori mediante ocho métodos MCDM. Las principales conclusiones son:
+
+\begin{enumerate}
+    \item \textbf{Formulación multiobjetivo:} la selección de parámetros de CLAHE se formuló como un problema de optimización multiobjetivo con tres funciones en conflicto (entropía, SSIM y VIF), cuya tensión quedó evidenciada en la estructura de los Frentes de Pareto obtenidos. La incorporación del VIF como métrica de fidelidad de información visual aporta un criterio perceptual que tolera el realce sin penalizar la ganancia de información: las soluciones seleccionadas alcanzaron un VIF medio de $1.19$ respecto a la imagen de entrada, es decir, superior a la unidad, lo que indica que el realce agrega información visual perceptible en lugar de limitarse a preservarla.
+
+    \item \textbf{Optimización con SMPSO:} la implementación canónica de SMPSO \citep{Nebro2009}, con coeficiente de constricción y restricción de velocidad, produjo aproximaciones del Frente de Pareto con buena convergencia y diversidad en un espacio de búsqueda mixto (entero-real), poblando el archivo externo hasta su capacidad máxima ($100.0 \pm 0.1$ soluciones no dominadas) en todas las imágenes procesadas, con un costo de $24.2 \pm 3.9$ minutos por imagen. El estudio de convergencia validó empíricamente el presupuesto de optimización: el hipervolumen alcanza el 99\% de su valor final antes de la iteración 30 en cinco de seis corridas de prueba, y duplicar el archivo externo densifica el frente sin extender su cobertura.
+
+    \item \textbf{Decisión multicriterio a posteriori:} los ocho métodos MCDM permitieron seleccionar automáticamente una solución final del Frente de Pareto sin requerir preferencias previas del decisor. El acuerdo exacto medio entre pares de métodos fue del 17.3\%, muy por encima del 1\% esperable por azar sobre frentes de 100 alternativas. SMARTER y GRA resultaron los métodos más representativos del consenso, mientras que Bellman-Zadeh, por su lógica maximin no compensatoria, se apartó sistemáticamente del comportamiento colectivo.
+
+    \item \textbf{Equivalencia ordinal entre SMARTER y MABAC:} se demostró algebraicamente y se verificó de forma numérica que, bajo criterios de beneficio y normalización lineal max-min, la puntuación de MABAC difiere de la utilidad aditiva de SMARTER en una constante, por lo que ambos métodos inducen exactamente el mismo ordenamiento de las alternativas. Este resultado, no señalado previamente en la literatura de MCDM aplicada a imágenes médicas, constituye una advertencia metodológica para los esquemas de consenso que combinan métodos sin verificar su independencia.
+
+    \item \textbf{Validación objetiva:} el esquema de degradación controlada permitió validar el framework contra una referencia conocida. La totalidad de las 83 imágenes de la muestra representativa recuperó fidelidad de información visual respecto a la imagen original ($+0.268$ de VIF, $p < 10^{-14}$ en la prueba de Wilcoxon) y el 81.9\% recuperó además similitud estructural ($+0.073$ de SSIM, $p < 10^{-9}$). La capacidad de recuperación depende fuertemente del tipo de degradación, siendo máxima ante el bajo contraste global y mínima ante el bajo contraste local.
+
+    \item \textbf{Robustez de la decisión:} el análisis de sensibilidad mostró que las selecciones dependen del orden de importancia asignado a los criterios más que del valor numérico exacto de los pesos: preservado dicho orden, el cambio de ROC a Rank Sum modifica el consenso en apenas el 12\% de las imágenes.
+\end{enumerate}
+
+\section{Contribuciones}
+
+Las contribuciones principales de este trabajo son:
+
+\begin{itemize}
+    \item Un framework completo, reproducible y de código abierto que integra optimización multiobjetivo y decisión multicriterio para la mejora de imágenes radiográficas, extendiendo el antecedente de \citet{More2015} al cerrar su final abierto mediante la reducción del Frente de Pareto a una única solución.
+    \item La incorporación del índice VIF como función objetivo para la mejora de contraste, con la justificación teórica de su idoneidad y la evidencia empírica de que captura la ganancia de información visual que las métricas acotadas no pueden expresar.
+    \item Un estudio comparativo de ocho métodos MCDM como mecanismos de selección a posteriori sobre Frentes de Pareto de mejora de imágenes, incluyendo el análisis de concordancia, correlación de rangos y consenso.
+    \item La demostración de la equivalencia ordinal entre SMARTER y MABAC bajo criterios de beneficio y normalización max-min, con sus implicaciones para el diseño de esquemas de consenso entre métodos MCDM.
+    \item Un esquema de validación con degradaciones controladas que provee referencia objetiva (\textit{ground truth}) en un dominio donde la evaluación perceptual con expertos es costosa y difícil de obtener.
+\end{itemize}
+
+\section{Trabajo futuro}
+
+Se identifican las siguientes líneas de continuación:
+
+\begin{itemize}
+    \item \textbf{Validación perceptual con expertos:} contrastar las selecciones de los métodos MCDM con la preferencia de profesionales odontólogos y radiólogos, para determinar qué método selecciona las imágenes de mayor utilidad diagnóstica percibida.
+    \item \textbf{Elicitación de pesos:} derivar los pesos de los criterios a partir de juicios de expertos y compararlos con las aproximaciones sustitutas empleadas.
+    \item \textbf{Otras modalidades de imagen:} extender la experimentación a radiografías torácicas, mamografías y otras modalidades con problemas de contraste.
+    \item \textbf{Otros optimizadores y métricas:} comparar SMPSO con NSGA-II, MOEA/D y otros algoritmos; explorar métricas adicionales de calidad perceptual.
+    \item \textbf{Reducción del costo computacional:} paralelización de la evaluación, uso de modelos subrogados o inicialización informada del enjambre para acercar el framework al uso clínico en tiempo real.
+\end{itemize}

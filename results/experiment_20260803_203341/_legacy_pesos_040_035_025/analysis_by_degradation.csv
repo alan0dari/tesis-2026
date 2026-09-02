@@ -1,0 +1,8 @@
+,compromise_H,compromise_H,compromise_SSIM,compromise_SSIM,compromise_VIF,compromise_VIF,entropy_improvement,entropy_improvement,contrast_improvement,contrast_improvement
+,mean,std,mean,std,mean,std,mean,std,mean,std
+degradation_type,,,,,,,,,,
+low_contrast,7.3208,0.1505,0.8439,0.0087,1.453,0.1559,1.2049,0.0996,0.1669,0.0099
+overexposure,7.7889,0.0654,0.9064,0.01,1.0141,0.028,0.7613,0.093,0.0825,0.0169
+poor_local_contrast,7.7581,0.1424,0.8934,0.0162,1.0056,0.0362,0.4021,0.072,0.1103,0.0126
+skewed_histogram,7.6954,0.1508,0.8629,0.0753,0.9985,0.0306,0.7596,0.0643,0.0795,0.0204
+underexposure,5.3084,1.063,0.6409,0.0876,1.0937,0.0467,0.8387,0.2635,0.0733,0.0201

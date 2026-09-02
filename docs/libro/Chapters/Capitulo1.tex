@@ -1,0 +1,120 @@
+\chapter{Introducción} % Título del capítulo
+\label{Chapter1} % Para referenciar el capítulo: \ref{Chapter1}
+\lhead{Capítulo 1. \emph{Introducción}}
+
+\section{Contexto y Motivación}
+
+Las ortopantomografías, también conocidas como radiografías panorámicas dentales, son herramientas diagnósticas esenciales en odontología que permiten visualizar la estructura completa de la dentadura, maxilares y estructuras adyacentes en una sola imagen. Sin embargo, estas imágenes a menudo presentan problemas de contraste debido a las limitaciones inherentes del proceso de adquisición, lo que puede dificultar la interpretación diagnóstica precisa.
+
+La mejora del contraste en imágenes médicas es un problema fundamental en el procesamiento de imágenes, especialmente en radiología dental donde la calidad de la imagen impacta directamente en la capacidad del profesional para detectar anomalías, planificar tratamientos y realizar diagnósticos precisos.
+
+Entre las técnicas de mejora de contraste, CLAHE (\textit{Contrast Limited Adaptive Histogram Equalization}) \citep{Zuiderveld1994} es una de las más utilizadas en el ámbito de las imágenes médicas, por su capacidad de realzar el contraste local sin sobreamplificar el ruido. No obstante, su desempeño depende fuertemente de la configuración de sus parámetros, y no existe una configuración única que resulte adecuada para todas las imágenes. Este trabajo extiende la línea de investigación iniciada por \citet{More2015}, quienes propusieron la sintonización de parámetros de CLAHE mediante optimización multiobjetivo para alcanzar distintos niveles de contraste en imágenes médicas, incorporando una etapa posterior de decisión multicriterio que automatiza la selección de la solución final.
+
+\section{Planteamiento del Problema}
+
+Dada una imagen radiográfica con deficiencias de contraste, se busca la configuración óptima de un método de mejora de contraste tal que, al aplicarse a la imagen, esta resulte de máxima utilidad para un profesional de la salud en un escenario de diagnóstico. Los principales desafíos incluyen:
+
+\begin{itemize}
+    \item \textbf{Variabilidad en la calidad de imagen:} Las condiciones de adquisición varían entre pacientes y equipos, resultando en imágenes con diferentes niveles de contraste y exposición.
+
+    \item \textbf{Selección de parámetros óptimos:} Los métodos de mejora como CLAHE requieren la configuración de múltiples parámetros (regiones contextuales, límite de recorte) cuya selección óptima es compleja y dependiente de cada imagen.
+
+    \item \textbf{Múltiples objetivos en conflicto:} La mejora debe optimizar simultáneamente varios criterios de calidad (cantidad de información, fidelidad estructural, fidelidad de información visual) que pueden estar en conflicto entre sí.
+
+    \item \textbf{Subjetividad en la evaluación:} La percepción de calidad visual varía entre observadores, haciendo necesario un enfoque sistemático y reproducible para la selección de la mejor imagen mejorada de entre un conjunto de candidatas.
+\end{itemize}
+
+\section{Objetivos}
+
+\subsection{Objetivo General}
+
+Desarrollar un framework que combine técnicas de procesamiento de imágenes, optimización multiobjetivo y métodos de decisión multicriterio para la mejora de contraste y la selección automática de imágenes radiográficas de utilidad diagnóstica.
+
+\subsection{Objetivos Específicos}
+
+\begin{enumerate}
+    \item Implementar el algoritmo CLAHE con parámetros ajustables ($R_x$, $R_y$, $C$) para la mejora de contraste en ortopantomografías.
+
+    \item Desarrollar un sistema de optimización multiobjetivo basado en SMPSO para encontrar configuraciones óptimas de parámetros de CLAHE.
+
+    \item Integrar múltiples métricas de evaluación (entropía de Shannon, SSIM y VIF) como funciones objetivo que caracterizan la calidad de las imágenes mejoradas.
+
+    \item Implementar ocho métodos de decisión multicriterio (SMARTER, TOPSIS, Bellman-Zadeh, PROMETHEE II, GRA, VIKOR, CODAS y MABAC) para la selección de la mejor solución del Frente de Pareto.
+
+    \item Validar el framework mediante experimentación con una muestra representativa de imágenes reales sometidas a degradaciones controladas, midiendo la recuperación de calidad respecto a la imagen original.
+
+    \item Evaluar la concordancia entre las selecciones de los diferentes métodos MCDM y caracterizar su comportamiento como mecanismos de decisión a posteriori.
+\end{enumerate}
+
+\section{Justificación}
+
+Este trabajo se justifica por las siguientes razones:
+
+\subsection{Relevancia Clínica}
+
+Las ortopantomografías son fundamentales para el diagnóstico y planificación de tratamientos odontológicos. Una mejor calidad de imagen permite:
+\begin{itemize}
+    \item Detección temprana de patologías
+    \item Planificación precisa de implantes dentales
+    \item Evaluación de estructuras maxilofaciales
+    \item Reducción de errores diagnósticos
+\end{itemize}
+
+\subsection{Innovación Metodológica}
+
+La integración de optimización multiobjetivo con múltiples métodos MCDM representa un enfoque que:
+\begin{itemize}
+    \item Automatiza la selección de parámetros óptimos sin requerir datos de entrenamiento ni anotaciones de expertos, a diferencia de los enfoques basados en aprendizaje profundo
+    \item Proporciona múltiples soluciones de compromiso interpretables: cada solución es una configuración de parámetros auditable
+    \item Permite incorporar preferencias del usuario a través de los pesos de los criterios
+    \item Ofrece robustez mediante el análisis de consenso entre métodos de decisión
+\end{itemize}
+
+\subsection{Aplicabilidad Práctica}
+
+El framework propuesto es:
+\begin{itemize}
+    \item Independiente del equipo de adquisición
+    \item Escalable a diferentes tipos de imágenes médicas
+    \item Implementable en flujos de trabajo clínicos existentes
+    \item Extensible a otros problemas de optimización multiobjetivo
+\end{itemize}
+
+\section{Alcance y Limitaciones}
+
+\subsection{Alcance}
+
+El presente trabajo abarca:
+\begin{itemize}
+    \item Implementación completa del framework propuesto
+    \item Experimentación con una muestra representativa de ortopantomografías
+    \item Análisis comparativo de ocho métodos MCDM y de su concordancia
+    \item Validación objetiva mediante degradaciones controladas con referencia conocida
+    \item Documentación y publicación del código fuente
+\end{itemize}
+
+\subsection{Limitaciones}
+
+Las limitaciones del estudio incluyen:
+\begin{itemize}
+    \item Enfoque específico en ortopantomografías (aunque la metodología es extensible a otras modalidades)
+    \item Uso de métricas objetivas como aproximación indirecta de la utilidad diagnóstica; la validación perceptual con profesionales odontólogos queda como trabajo futuro
+    \item Tiempo computacional requerido por la optimización evolutiva para cada imagen
+    \item Los pesos de los criterios se definen mediante aproximaciones basadas en el orden de importancia, no mediante elicitación directa con expertos
+\end{itemize}
+
+\section{Estructura del Documento}
+
+El resto de este documento está organizado de la siguiente manera:
+
+\begin{description}
+    \item[Capítulo 2:] Marco teórico sobre imágenes radiográficas, ortopantomografías, técnicas de mejora de contraste y métricas de evaluación de calidad de imagen.
+
+    \item[Capítulo 3:] Fundamentos de optimización multiobjetivo, el algoritmo SMPSO y los métodos de decisión multicriterio empleados.
+
+    \item[Capítulo 4:] Materiales y metodología, describiendo la arquitectura del framework por etapas, su implementación y el diseño experimental.
+
+    \item[Capítulo 5:] Pruebas experimentales y análisis de resultados.
+
+    \item[Capítulo 6:] Conclusiones, contribuciones del trabajo y direcciones futuras de investigación.
+\end{description}
