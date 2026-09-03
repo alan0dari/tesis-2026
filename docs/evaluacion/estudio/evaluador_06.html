@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación de radiografías — Evaluador 06</title>
+<style>
+  :root { --bg:#111; --panel:#1c1c1c; --ink:#eee; --dim:#999; --accent:#4a9eff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding:10px 18px; background:var(--panel); border-bottom:1px solid #333;
+           display:flex; align-items:center; gap:18px; position:sticky; top:0; z-index:10; }
+  #bar { flex:1; height:8px; background:#333; border-radius:4px; overflow:hidden; }
+  #fill { height:100%; width:0%; background:var(--accent); transition:width .3s; }
+  #count { font-variant-numeric: tabular-nums; color:var(--dim); font-size:14px;
+           white-space:nowrap; }
+  main { max-width:1500px; margin:0 auto; padding:16px; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .frame { position:relative; overflow:hidden; background:#000; border-radius:6px;
+           aspect-ratio: 450 / 297; cursor:grab; }
+  .frame.drag { cursor:grabbing; }
+  .frame img { position:absolute; left:0; top:0; width:100%; height:100%;
+               transform-origin:0 0; image-rendering:auto; user-select:none;
+               -webkit-user-drag:none; }
+  .tag { position:absolute; left:10px; top:8px; font-size:15px; font-weight:600;
+         color:#fff; background:rgba(0,0,0,.55); padding:2px 10px; border-radius:4px;
+         pointer-events:none; }
+  .q { margin-top:18px; text-align:center; }
+  .q p { margin:0 0 10px; font-size:17px; }
+  .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  button { background:#262626; color:var(--ink); border:1px solid #3a3a3a;
+           padding:12px 26px; border-radius:6px; font-size:15px; cursor:pointer; }
+  button:hover { background:#333; border-color:var(--accent); }
+  button kbd { color:var(--dim); font-size:12px; margin-left:8px; }
+  .hint { color:var(--dim); font-size:13px; margin-top:14px; text-align:center; }
+  .card { max-width:760px; margin:6vh auto; background:var(--panel); padding:30px 34px;
+          border-radius:10px; line-height:1.65; }
+  .card h1 { margin-top:0; font-size:22px; }
+  .card li { margin-bottom:8px; }
+  .card button { margin-top:18px; background:var(--accent); border:none; color:#fff;
+                 font-size:16px; padding:13px 30px; }
+  .hidden { display:none; }
+  .warm { color:#ffb454; font-size:13px; text-align:center; margin-bottom:8px; }
+</style>
+</head>
+<body>
+
+<div id="intro" class="card">
+  <h1>Evaluación perceptual de radiografías panorámicas</h1>
+  <p>Gracias por participar. Va a ver <b>pares de recortes</b> de una misma
+     radiografía, mostrando la misma región en ambos. Cambia sólo el
+     procesamiento de la imagen.</p>
+  <p>En cada pantalla elija <b>en cuál de las dos evaluaría esa región con más
+     confianza</b> para un diagnóstico.</p>
+  <ul>
+    <li>No hay respuesta correcta: interesa su criterio clínico.</li>
+    <li><b>Muchos pares van a parecerle iguales o casi iguales.</b> Es esperable y
+        forma parte de lo que se quiere medir. Elija igual la que prefiera y
+        marque <i>“Estoy adivinando”</i>.</li>
+    <li>Puede <b>acercar con la rueda del mouse</b> y <b>arrastrar</b> para
+        desplazarse. Las dos imágenes se mueven juntas.</li>
+    <li>No se puede volver atrás.</li>
+    <li>Puede cerrar y retomar después: el progreso queda guardado.</li>
+    <li>Son unas <b>75 pantallas</b>, entre 25 y 30 minutos. Tómese un
+        descanso si lo necesita.</li>
+  </ul>
+  <p>Los primeros 5 pares son de práctica y no se analizan.</p>
+  <button onclick="start()">Comenzar</button>
+</div>
+
+<header id="hud" class="hidden">
+  <strong>Evaluador 06</strong>
+  <div id="bar"><div id="fill"></div></div>
+  <div id="count"></div>
+</header>
+
+<main id="task" class="hidden">
+  <div id="warm" class="warm hidden">Par de práctica — no se analiza</div>
+  <div class="pair">
+    <div class="frame" id="fa"><img id="ia" alt=""><span class="tag">A</span></div>
+    <div class="frame" id="fb"><img id="ib" alt=""><span class="tag">B</span></div>
+  </div>
+
+  <div class="q" id="q1">
+    <p>¿En cuál de las dos evaluaría esta región con más confianza?</p>
+    <div class="btns">
+      <button onclick="choose('a')">Imagen A <kbd>A</kbd></button>
+      <button onclick="choose('b')">Imagen B <kbd>B</kbd></button>
+    </div>
+  </div>
+
+  <div class="q hidden" id="q2">
+    <p>¿Qué tan seguro está de esa elección?</p>
+    <div class="btns">
+      <button onclick="confidence('seguro')">Seguro <kbd>1</kbd></button>
+      <button onclick="confidence('algo')">Algo seguro <kbd>2</kbd></button>
+      <button onclick="confidence('adivinando')">Estoy adivinando <kbd>3</kbd></button>
+    </div>
+  </div>
+
+  <div class="hint">Rueda del mouse para acercar · arrastrar para desplazar ·
+       doble clic para reiniciar la vista</div>
+</main>
+
+<div id="done" class="card hidden">
+  <h1>Listo, muchas gracias</h1>
+  <p>Se descargó el archivo con sus respuestas. Si la descarga no arrancó,
+     use el botón.</p>
+  <button onclick="save()">Descargar respuestas</button>
+</div>
+
+<script>
+const RATER = "06";
+const TRIALS = [{"id":"81c5f8545f","warmup":true,"a":"a9e29de41b.png","b":"5e83753842.png"},{"id":"55adb92963","warmup":true,"a":"63735df7fa.png","b":"ac579d077e.png"},{"id":"923d929fd9","warmup":true,"a":"f55ce859a6.png","b":"dec3928264.png"},{"id":"12a9315d32","warmup":true,"a":"730d3d22a8.png","b":"21103d7cd0.png"},{"id":"6ecd0860db","warmup":true,"a":"2da716eafe.png","b":"be59f317b7.png"},{"id":"c4def28fb3","a":"319dfaf614.png","b":"cfecc63304.png"},{"id":"9a5e3fe6d8","a":"b8a1b45470.png","b":"02925bd519.png"},{"id":"dfb158e8f3","a":"45bd39f911.png","b":"79eaaf8039.png"},{"id":"28c896569b","a":"d1609940aa.png","b":"16319ed714.png"},{"id":"097c988d2b","a":"2894249359.png","b":"32133c7ce0.png"},{"id":"fcbf68721b","a":"c8c9a93a43.png","b":"ed56368d08.png"},{"id":"5f305d359a","a":"8306a36deb.png","b":"8b9cae17b5.png"},{"id":"fdab3d4f9b","a":"9ae7e5932d.png","b":"02925bd519.png"},{"id":"5f19739bc1","a":"387f469631.png","b":"2e301d6458.png"},{"id":"2f869af36d","a":"ac579d077e.png","b":"807140a1f3.png"},{"id":"6adfdc9914","a":"4bd1f762a8.png","b":"4291842b3d.png"},{"id":"15df29ca50","a":"3eeab6accb.png","b":"0cae67132f.png"},{"id":"cb7efb2be4","a":"a280ce5a7d.png","b":"8306a36deb.png"},{"id":"5d62aa8f33","a":"6188c5c8a2.png","b":"fd111c40cb.png"},{"id":"62d6b2e102","a":"c84e70c43e.png","b":"3eee0f1fa5.png"},{"id":"9b9e602ab9","a":"01548f06d1.png","b":"9216c75646.png"},{"id":"d2554228d4","a":"6506c4eac6.png","b":"16c3d492e7.png"},{"id":"9c05c0258c","a":"b57c2022fd.png","b":"1fc2913315.png"},{"id":"5263612f30","a":"56e6387701.png","b":"aa0cca8d75.png"},{"id":"f179999555","a":"8bf8ade955.png","b":"7dabafcb1b.png"},{"id":"517698308c","a":"865f3560d6.png","b":"045025b9d9.png"},{"id":"00932866ce","a":"fde71cb009.png","b":"d119215a36.png"},{"id":"c99f88127e","a":"298d8927dd.png","b":"240a43b4b6.png"},{"id":"58b530a571","a":"1eb2b0bc93.png","b":"aa1e09e2cf.png"},{"id":"93340550e4","a":"fcee39ccd4.png","b":"dc11921892.png"},{"id":"02ec7894b1","a":"28f9055367.png","b":"498258d991.png"},{"id":"f66e5348e8","a":"b441dd6a32.png","b":"de8a075b78.png"},{"id":"5af9d95e2e","a":"2b7b4b53dd.png","b":"dd5f08859e.png"},{"id":"3ef3cb30ee","a":"1fc2913315.png","b":"3e498ae709.png"},{"id":"5dec751dba","a":"32d2c93bed.png","b":"de0fb315fb.png"},{"id":"a71cb36d91","a":"e1c54bb49a.png","b":"94061cfd5d.png"},{"id":"7d6b150f6e","a":"1c87a1199f.png","b":"4444d21759.png"},{"id":"150b60ee96","a":"9cea541df1.png","b":"fc4c61c912.png"},{"id":"7b175cfa81","a":"5507d4cb08.png","b":"ebd74b352d.png"},{"id":"7c3f5ad7b2","a":"8e9902d364.png","b":"c30c617a5b.png"},{"id":"8dec7d0fd3","a":"de2cd0de58.png","b":"f586f9c21a.png"},{"id":"9cfcdfd21e","a":"0cae67132f.png","b":"2d361176e4.png"},{"id":"902fe282cf","a":"ecc1cc955b.png","b":"c8c9a93a43.png"},{"id":"454ba1b4dd","a":"ba70b51e5e.png","b":"ea0c0696d9.png"},{"id":"8a6d2384e0","a":"2193479960.png","b":"d76079f33c.png"},{"id":"40c0650caf","a":"7b28a2e6f0.png","b":"44157dd24f.png"},{"id":"1e911e575c","a":"849fb18960.png","b":"9f8a6e3ccf.png"},{"id":"154f16cbdd","a":"de2cd0de58.png","b":"d7f2b95317.png"},{"id":"13a64b93f9","a":"b82c355294.png","b":"8a6db1f72e.png"},{"id":"4a23f63d05","a":"bcb8c2526f.png","b":"37c61b9579.png"},{"id":"e9defeeb66","a":"3ea7ff6ecf.png","b":"b12fe41c7d.png"},{"id":"b60029e073","a":"bb5b48526c.png","b":"94f384f18b.png"},{"id":"7413753a36","a":"a19baead15.png","b":"3131784f39.png"},{"id":"aff0af27b8","a":"5f72f1dfca.png","b":"9cea541df1.png"},{"id":"294d719e32","a":"aa0cca8d75.png","b":"3057aa7f85.png"},{"id":"a0d74f8976","a":"9d680921b3.png","b":"b2b9d8a5a8.png"},{"id":"4c6c725c5c","a":"be535a4fe1.png","b":"afa52d8603.png"},{"id":"c195b120a3","a":"2da716eafe.png","b":"8e513a96fe.png"},{"id":"a39a4afe4f","a":"3059fc0710.png","b":"1822d37087.png"},{"id":"b9bb687c10","a":"8e513a96fe.png","b":"be59f317b7.png"},{"id":"52fa3aab6b","a":"afd1fcb86b.png","b":"e92ec03073.png"},{"id":"c6a84ea430","a":"4fbfa83d0b.png","b":"cfecc63304.png"},{"id":"32c68699ab","a":"4ca39e57e5.png","b":"fde71cb009.png"},{"id":"75a9b4187e","a":"5cbe27d0b9.png","b":"b0787bc349.png"},{"id":"8783c766b1","a":"387f469631.png","b":"8521912d17.png"},{"id":"c564c82061","a":"c68cdb9ffd.png","b":"f5510ec354.png"},{"id":"1e96fe60f9","a":"6188c5c8a2.png","b":"2a3bf9fe19.png"},{"id":"f4d0e7561f","a":"ebd74b352d.png","b":"b7d6f73c3b.png"},{"id":"bd934ce0c1","a":"040e80d01a.png","b":"5e83753842.png"},{"id":"624461dfaf","a":"66ebf5cf08.png","b":"1c3a7c68cf.png"},{"id":"097c988d2b","repeat":true,"a":"2894249359.png","b":"32133c7ce0.png"},{"id":"9a5e3fe6d8","repeat":true,"a":"b8a1b45470.png","b":"02925bd519.png"},{"id":"b60029e073","repeat":true,"a":"bb5b48526c.png","b":"94f384f18b.png"},{"id":"150b60ee96","repeat":true,"a":"9cea541df1.png","b":"fc4c61c912.png"},{"id":"93340550e4","repeat":true,"a":"fcee39ccd4.png","b":"dc11921892.png"}];
+const KEY = "eval_odont_" + RATER;
+
+let i = 0, pick = null, t0 = 0, answers = [];
+let zoom = 1, panX = 0, panY = 0;
+
+const $ = id => document.getElementById(id);
+
+// Se guarda en cada respuesta para poder cortar y retomar la sesión
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+  if (saved && saved.answers) { answers = saved.answers; i = answers.length; }
+} catch (e) {}
+
+function start() {
+  $("intro").classList.add("hidden");
+  $("hud").classList.remove("hidden");
+  $("task").classList.remove("hidden");
+  show();
+}
+
+function show() {
+  if (i >= TRIALS.length) return finish();
+  const t = TRIALS[i];
+  resetView();
+  $("ia").src = "img/" + t.a;
+  $("ib").src = "img/" + t.b;
+  $("warm").classList.toggle("hidden", !t.warmup);
+  $("q1").classList.remove("hidden");
+  $("q2").classList.add("hidden");
+  $("fill").style.width = (100 * i / TRIALS.length) + "%";
+  $("count").textContent = (i + 1) + " / " + TRIALS.length;
+  pick = null;
+  t0 = performance.now();
+}
+
+function choose(side) {
+  pick = side;
+  $("q1").classList.add("hidden");
+  $("q2").classList.remove("hidden");
+}
+
+function confidence(level) {
+  const t = TRIALS[i];
+  answers.push({
+    trial_id: t.id, eleccion: pick, confianza: level,
+    ms: Math.round(performance.now() - t0),
+    warmup: !!t.warmup, repeticion: !!t.repeat, orden: i + 1
+  });
+  localStorage.setItem(KEY, JSON.stringify({ answers }));
+  i++;
+  show();
+}
+
+function finish() {
+  $("hud").classList.add("hidden");
+  $("task").classList.add("hidden");
+  $("done").classList.remove("hidden");
+  save();
+}
+
+function save() {
+  const blob = new Blob(
+    [JSON.stringify({ evaluador: RATER, fecha: new Date().toISOString(),
+                      respuestas: answers }, null, 1)],
+    { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "respuestas_evaluador_" + RATER + ".json";
+  a.click();
+}
+
+// --- zoom y desplazamiento, sincronizados entre las dos imágenes ---
+function applyView() {
+  const t = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  $("ia").style.transform = t;
+  $("ib").style.transform = t;
+}
+function resetView() { zoom = 1; panX = 0; panY = 0; applyView(); }
+
+for (const id of ["fa", "fb"]) {
+  const el = $(id);
+  el.addEventListener("wheel", e => {
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const next = Math.min(8, Math.max(1, zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+    // Acercar hacia el puntero: el punto bajo el cursor se queda quieto
+    panX = mx - (mx - panX) * (next / zoom);
+    panY = my - (my - panY) * (next / zoom);
+    zoom = next;
+    if (zoom === 1) { panX = 0; panY = 0; }
+    applyView();
+  }, { passive: false });
+
+  let dragging = false, sx = 0, sy = 0;
+  el.addEventListener("mousedown", e => {
+    dragging = true; sx = e.clientX - panX; sy = e.clientY - panY;
+    el.classList.add("drag");
+  });
+  window.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    panX = e.clientX - sx; panY = e.clientY - sy; applyView();
+  });
+  window.addEventListener("mouseup", () => {
+    dragging = false; el.classList.remove("drag");
+  });
+  el.addEventListener("dblclick", resetView);
+}
+
+document.addEventListener("keydown", e => {
+  if ($("task").classList.contains("hidden")) return;
+  const k = e.key.toLowerCase();
+  if (!$("q1").classList.contains("hidden")) {
+    if (k === "a" || k === "arrowleft") choose("a");
+    if (k === "b" || k === "arrowright") choose("b");
+  } else if (!$("q2").classList.contains("hidden")) {
+    if (k === "1") confidence("seguro");
+    if (k === "2") confidence("algo");
+    if (k === "3") confidence("adivinando");
+  }
+});
+</script>
+</body>
+</html>

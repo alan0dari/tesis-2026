@@ -1,0 +1,76 @@
+# Conjunto de 50 ortopantomografías para el estudio perceptual con odontólogos.
+#
+# Criterio del tutor: "todas las piezas dentarias y sin ningún trabajo hecho
+# sobre los dientes, o por lo menos con la menor modificación posible."
+#
+# Procedimiento: `scripts/screen_evaluation_set.py` puntuó las 598 imágenes y
+# ordenó las 356 sin material radiopaco franco por completitud de dentición.
+# Sobre las 99 mejores (hojas de contacto 01-11) se hizo revisión visual una
+# por una. El triaje automático es sólo un pre-filtro: en la revisión se
+# descartaron casos que se le habían escapado -- ortodoncia en 142, 219, 223,
+# 279, 486 (arcos y brackets que no cruzan el umbral absoluto en estudios
+# subexpuestos) y numerosas denticiones mixtas pediátricas, que el detector
+# premia porque los gérmenes dentarios en desarrollo responden al top-hat.
+#
+# TIER A (40) - dentición permanente completa, sin trabajos visibles.
+# TIER B (10) - dentición completa con modificación mínima: una o dos
+#               obturaciones pequeñas. Se incluyen para llegar a 50, bajo la
+#               tolerancia explícita del tutor. Quedan marcadas para poder
+#               analizarlas por separado si hiciera falta.
+#
+# Revisión: Claude (2026-08-03), sobre hojas de contacto a 900x450 px por
+# imagen. Conviene que el tutor valide el Tier B a resolución completa.
+
+# ---- TIER A ----
+256
+313
+237
+456
+64
+436
+269
+84
+195
+227
+356
+34
+150
+391
+48
+469
+204
+377
+513
+197
+305
+229
+451
+541
+508
+435
+49
+386
+365
+262
+497
+472
+406
+332
+346
+99
+184
+26
+520
+301
+
+# ---- TIER B (modificación mínima) ----
+294
+550
+249
+274
+350
+342
+477
+560
+551
+138

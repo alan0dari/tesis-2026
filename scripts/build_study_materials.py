@@ -59,8 +59,14 @@ SEXTANT_X = {
     'anterior': (0.39, 0.61),
     'posterior_izquierdo': (0.60, 0.82),
 }
-# Medio alto del recorte, en fracción de la altura: cubre corona más raíz.
-SEXTANT_HALF_HEIGHT = 0.145
+# Alto del recorte medido desde el plano oclusal, en fracción de la altura de la
+# imagen: (arriba, abajo). Es asimétrico a propósito. Las raíces del maxilar
+# suben hacia el piso del seno y las de la mandíbula bajan hacia el conducto, así
+# que el lado del ápice necesita bastante más lugar que el lado de la corona.
+SEXTANT_SPAN = {
+    'superior': (0.27, 0.07),
+    'inferior': (0.07, 0.35),
+}
 SEXTANTS = [(a, b) for b in ('superior', 'inferior') for a in SEXTANT_X]
 
 # Presupuesto de ensayos (protocolo §5)
@@ -83,9 +89,9 @@ SEARCH_Y = (0.28, 0.76)
 SAFE_Y = (0.07, 0.93)
 
 
-def arch_anchor(image, x0, x1, arch):
+def occlusal_plane(image, x0, x1):
     """
-    Centro vertical de la arcada pedida dentro de una franja de columnas.
+    Plano oclusal dentro de una franja de columnas.
 
     Un top-hat con núcleo del tamaño de una pieza deja sólo las estructuras
     compactas y brillantes -- los dientes -- sobre el fondo suave del hueso. El
@@ -103,8 +109,11 @@ def arch_anchor(image, x0, x1, arch):
       fuera del maxilar, al seno maxilar o a la apertura nasal, todos más oscuros
       que el espacio interoclusal.
 
-    El maxilar es entonces el lóbulo inmediatamente por encima del plano oclusal;
-    si no hay ninguno, se recurre a un desplazamiento anatómico por defecto.
+    Se ancla acá y no en el lóbulo de cada arcada porque el lóbulo del maxilar es
+    inestable: el seno y el malar responden al top-hat tanto como los molares, y
+    según la imagen el anclaje se iba al seno o caía sobre el propio oclusal. El
+    mínimo de intensidad entre las dos arcadas, en cambio, se detecta parejo en
+    las 50.
     """
     h = image.shape[0]
     ya, yb = int(SEARCH_Y[0] * h), int(SEARCH_Y[1] * h)
@@ -133,10 +142,7 @@ def arch_anchor(image, x0, x1, arch):
     top = max(0, mandible - int(0.14 * h))
     occlusal = top + int(intensity[top:mandible + 1].argmin())
 
-    if arch == 'inferior':
-        return ya + mandible
-    above = [p for p in peaks if p < occlusal]
-    return ya + (int(above[-1]) if above else max(0, occlusal - int(0.10 * h)))
+    return ya + occlusal
 
 
 def tooth_response(image, x0, x1):
@@ -150,32 +156,36 @@ def tooth_response(image, x0, x1):
 
 def sextant_box(image, sextant):
     """
-    Rectángulo del sextante, centrado en la arcada que corresponda.
+    Rectángulo del sextante, anclado en el plano oclusal.
 
-    Tras anclar en el lóbulo dental se hace un ajuste fino: se prueban
-    desplazamientos verticales y se elige el que deja más estructura dental
-    dentro del cuadro. Las reglas geométricas solas no cubren la variación
-    anatómica -- en algunos pacientes el sector posterior mandibular cae en
-    diagonal pronunciada y un rectángulo de alto fijo se llena de fondo --, y
-    optimizar directamente el contenido dental es más simple que seguir
-    afinando reglas.
+    La versión anterior centraba una caja de alto fijo donde más respondía el
+    top-hat dental. Eso optimiza en contra de lo que hace falta ver: el esmalte
+    responde mucho más que el hueso periapical, así que la caja se centraba en
+    las coronas y dejaba los ápices fuera de cuadro. Los odontólogos que
+    revisaron el material lo marcaron sobre todo en los sectores posteriores.
+
+    Ahora se ancla en el plano oclusal y se extiende hacia donde van las raíces
+    de la arcada pedida, con los márgenes de SEXTANT_SPAN. Así el recorte incluye
+    corona, raíz completa y el hueso de alrededor -- el piso del seno en los
+    posteriores superiores, la zona del conducto en los inferiores.
     """
     region, arch = sextant
     h, w = image.shape
     x0, x1 = (int(f * w) for f in SEXTANT_X[region])
 
-    centre = arch_anchor(image, x0, x1, arch)
-    height = int(2 * SEXTANT_HALF_HEIGHT * h)
-    response = tooth_response(image, x0, x1)
-    top_limit, bottom_limit = SAFE_Y[0] * h, SAFE_Y[1] * h
+    arriba, abajo = SEXTANT_SPAN[arch]
+    occlusal = occlusal_plane(image, x0, x1)
+    y0, y1 = occlusal - int(arriba * h), occlusal + int(abajo * h)
+    height = y1 - y0
 
-    def clamp(y0):
-        return int(np.clip(y0, max(0, top_limit), min(h, bottom_limit) - height))
-
-    best = max((float(response[y:y + height].mean()), y)
-               for y in (clamp(centre - height // 2 + int(d * h))
-                         for d in np.arange(-0.06, 0.061, 0.01)))[1]
-    return x0, best, x1, best + height
+    # Sin invadir las bandas de anotación quemada: se desplaza la caja entera en
+    # vez de recortarla, para que el alto no cambie entre imágenes.
+    top_limit, bottom_limit = int(SAFE_Y[0] * h), int(SAFE_Y[1] * h)
+    if y0 < top_limit:
+        y0, y1 = top_limit, top_limit + height
+    if y1 > bottom_limit:
+        y0, y1 = bottom_limit - height, bottom_limit
+    return x0, max(0, y0), x1, min(h, y1)
 
 
 def crop(image, box):
@@ -450,9 +460,11 @@ def main():
         **_delta_objectives(per_image[t['image_id']], t['cond_a'], t['cond_b']),
     } for t in trials])
     key.to_csv(out_dir / 'clave.csv', index=False)
+    write_index(key, per_image, out_dir)
 
     print(f'\n  {out_dir / "trials.json"}')
     print(f'  {out_dir / "clave.csv"}   <- NO enviar a los evaluadores')
+    print(f'  {out_dir / "img" / "INDICE.md"}   <- NO enviar a los evaluadores')
     print(f'\nSextantes: '
           + ', '.join(f'{k}={v}' for k, v in
                       pd.Series(['_'.join(d['sextant']) for d in per_image.values()])
@@ -460,14 +472,113 @@ def main():
     return by_id
 
 
+SECTOR_LARGO = {
+    'posterior_derecho_superior': 'Posterior superior derecho — del paciente, o sea a la izquierda de la imagen (lado «R»)',
+    'posterior_derecho_inferior': 'Posterior inferior derecho — del paciente, o sea a la izquierda de la imagen (lado «R»)',
+    'anterior_superior': 'Anterior superior — incisivos y caninos del maxilar',
+    'anterior_inferior': 'Anterior inferior — incisivos y caninos de la mandíbula',
+    'posterior_izquierdo_superior': 'Posterior superior izquierdo — del paciente, o sea a la derecha de la imagen (lado «L»)',
+    'posterior_izquierdo_inferior': 'Posterior inferior izquierdo — del paciente, o sea a la derecha de la imagen (lado «L»)',
+}
+
+
+def write_index(key, per_image, out_dir):
+    """
+    Índice navegable dentro de `img/`, para poder ir del recorte a su radiografía.
+
+    Los recortes se llaman con un hash a propósito -- que el evaluador no pueda
+    inferir la condición mirando el sitio --, y eso deja al equipo sin poder
+    hacerlo tampoco. Esta tabla es la traducción, con enlaces relativos que
+    GitHub y cualquier visor de Markdown resuelven solos.
+
+    **Revela qué condición es cada recorte, así que es interno igual que
+    `clave.csv`.** No viaja a la web: `build_web_study.py` copia sólo `*.png`.
+    """
+    img_dir = out_dir / 'img'
+
+    # condición -> dónde se usa, por imagen
+    usos = {}
+    for r in key.itertuples():
+        for cond, lado in ((r.cond_izquierda, 'izq'), (r.cond_derecha, 'der')):
+            usos.setdefault((r.image_id, cond), []).append(f'{r.trial_id} ({r.block}, {lado})')
+
+    lineas = [
+        '# Índice de recortes',
+        '',
+        'Generado por `scripts/build_study_materials.py`. Cada recorte se llama',
+        '`sha1("<id de la radiografía>|<condición>")` truncado a 10 caracteres, para que',
+        'el evaluador no pueda inferir nada mirando el sitio.',
+        '',
+        '> **Interno, igual que `clave.csv`.** Dice qué condición experimental es cada',
+        '> recorte: si un evaluador lo ve, se rompe el ciego. No se sube a la web —',
+        '> `build_web_study.py` copia únicamente los `.png`.',
+        '',
+        'Los enlaces son relativos y funcionan desde GitHub o desde cualquier visor de',
+        'Markdown, siempre que `data/` y `results/` estén en su lugar.',
+        '',
+        '## Por radiografía',
+        '',
+        '| Radiografía | Sector evaluado | Recortes usados en la evaluación |',
+        '|---|---|---|',
+    ]
+
+    for image_id in sorted(per_image, key=lambda x: int(x)):
+        d = per_image[image_id]
+        sextante = '_'.join(d['sextant'])
+        pano = f'../../../../data/evaluacion_50/{image_id}.jpg'
+        conds = sorted({c for (i, c) in usos if i == image_id})
+        recortes = '<br>'.join(
+            f'[`{opaque(image_id, c)}.png`]({opaque(image_id, c)}.png) — `{c}`'
+            for c in conds)
+        lineas.append(f'| **[{image_id}]({pano})** | {sextante} | {recortes} |')
+
+    lineas += [
+        '',
+        '## Por recorte',
+        '',
+        'Para el camino inverso: de un archivo suelto a su radiografía.',
+        '',
+        '| Recorte | Radiografía | Sector | Condición | Ensayos |',
+        '|---|---|---|---|---|',
+    ]
+
+    filas = []
+    for (image_id, cond), donde in usos.items():
+        sextante = '_'.join(per_image[image_id]['sextant'])
+        filas.append((f'{opaque(image_id, cond)}.png', image_id, sextante, cond,
+                      ', '.join(sorted(donde))))
+    for archivo, image_id, sextante, cond, donde in sorted(filas):
+        pano = f'../../../../data/evaluacion_50/{image_id}.jpg'
+        lineas.append(f'| [`{archivo}`]({archivo}) | [{image_id}]({pano}) '
+                      f'| {sextante} | `{cond}` | {donde} |')
+
+    lineas += ['', '## Los seis sectores', '',
+               '| Clave | Qué es |', '|---|---|']
+    for k, v in SECTOR_LARGO.items():
+        lineas.append(f'| `{k}` | {v} |')
+    lineas += ['',
+               'Ojo con la lateralidad: **derecho e izquierdo son del paciente**, así que el',
+               'sector posterior derecho cae a la izquierda de la imagen, donde está la',
+               'marca «R».', '']
+
+    (img_dir / 'INDICE.md').write_text('\n'.join(lineas), encoding='utf-8')
+
+
 def report_framing(per_image, out_dir):
     """
     Verifica el encuadre de los 50 recortes sin depender de mirarlos uno por uno.
 
-    Mide la respuesta media al top-hat dental dentro del recorte, relativa a la
-    mejor respuesta disponible en esa columna de la radiografía. Un valor bajo
-    significa que el encuadre agarró poco diente -- se fue a hueso, a seno o
-    fuera del maxilar --, que es exactamente el modo de fallo a vigilar.
+    Dos medidas. `relativo_al_mejor` es la respuesta media al top-hat dental
+    dentro del recorte, contra la mejor disponible en esa columna: sirve para
+    detectar el recorte que se fue del todo a hueso o fuera del maxilar. Ojo con
+    interpretarla como antes: el encuadre nuevo incluye a propósito ápices y
+    hueso periapical, que responden poco, así que los valores bajaron para todos
+    y lo que importa es el orden relativo, no el valor absoluto.
+
+    `oclusal_rel` es dónde cae el plano oclusal dentro del recorte, de 0 (borde
+    superior) a 1 (inferior). Es el control directo del encuadre nuevo: tiene que
+    dar cerca de 0.79 en los superiores y 0.17 en los inferiores. Un valor lejos
+    de eso delata una detección de oclusal fallada.
 
     Contar píxeles oscuros no sirve: en estas radiografías el fondo ronda los 30-60
     niveles, no el negro, y un umbral absoluto marcaba 0.00 en recortes que a
@@ -480,22 +591,36 @@ def report_framing(per_image, out_dir):
         height = y1 - y0
         best = max(float(response[y:y + height].mean())
                    for y in range(0, len(response) - height, 8))
+        occlusal = occlusal_plane(d['images']['original'], x0, x1)
         rows.append({
             'image_id': image_id,
             'sextante': '_'.join(d['sextant']),
+            'oclusal_rel': round((occlusal - y0) / height, 3),
             'contenido_dental': round(float(response[y0:y1].mean()), 1),
             'relativo_al_mejor': round(float(response[y0:y1].mean()) / max(best, 1e-6), 3),
         })
     df = pd.DataFrame(rows).sort_values('relativo_al_mejor')
     df.to_csv(out_dir / 'encuadre.csv', index=False)
 
-    print(f'\nEncuadre -- contenido dental relativo al mejor encuadre posible:')
-    print(f'  mediana {df.relativo_al_mejor.median():.2f}, '
-          f'p10 {df.relativo_al_mejor.quantile(0.1):.2f}, '
-          f'mínimo {df.relativo_al_mejor.min():.2f}')
-    print('  Peores 5 (revisar a ojo si bajan de ~0.85):')
-    for _, r in df.head(5).iterrows():
-        print(f'    img {r.image_id:>4}  {r.sextante:<28} {r.relativo_al_mejor:.2f}')
+    # El control que importa ahora: donde cae el plano oclusal dentro del
+    # recorte. Si se aleja de lo que pide SEXTANT_SPAN es que fallo la deteccion
+    # del oclusal, o que la caja topo contra la banda de anotacion y se corrio.
+    print("\nEncuadre -- posicion del plano oclusal dentro del recorte:")
+    for arch, (arriba, abajo) in SEXTANT_SPAN.items():
+        g = df[df.sextante.str.endswith(arch)]
+        esperado = arriba / (arriba + abajo)
+        fuera = g[(g.oclusal_rel - esperado).abs() > 0.08]
+        print(f"  {arch:<9} esperado {esperado:.2f}  "
+              f"mediana {g.oclusal_rel.median():.2f}  fuera de rango: {len(fuera)}")
+        for _, r in fuera.iterrows():
+            print(f"    img {r.image_id:>4}  {r.sextante:<28} {r.oclusal_rel:.2f}")
+
+    print("\nContenido dental relativo al mejor encuadre posible:")
+    print(f"  mediana {df.relativo_al_mejor.median():.2f}, "
+          f"p10 {df.relativo_al_mejor.quantile(0.1):.2f}, "
+          f"minimo {df.relativo_al_mejor.min():.2f}")
+    print("  Sirve para comparar entre recortes, no contra un umbral fijo: el "
+          "encuadre incluye a proposito hueso, que responde poco al top-hat.")
 
 
 def _methods_of(data, cond):
